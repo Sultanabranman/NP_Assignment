@@ -24,4 +24,30 @@
  */
 public class Dealer {
 
+	public Dealer()
+	{
+		//Wait for player connection to the game
+		
+		//When player connects to the game, start the game
+		
+		//Deal two cards to player
+		
+		//Deal two cards to dealer
+		
+		//If the player requests a card, deal card to player
+		
+		//If the player goes bust, the dealer starts a new game after all 
+		//information is logged to server
+		
+		//If the player stands, dealer plays their hand
+		
+		//While Loop
+			//If the dealer's hand totals over 17, the dealer stands
+			
+			//If the dealer's hand totals under 17, the dealer draws a card
+		
+		//Dealer evaluates cards
+		
+		//Dealer communicates results to the server.
+	}
 }

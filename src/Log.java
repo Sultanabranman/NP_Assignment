@@ -8,5 +8,12 @@
  *
  */
 public class Log {
+	
+	public Log()
+	{
+		//Constructor for a new log file
+		
+		//Add new entry to log file
+	}
 
 }

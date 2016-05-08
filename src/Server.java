@@ -28,4 +28,32 @@
  */
 public class Server {
 
+	public Server()
+	{
+		//Create log files
+		
+		//Create client list
+		
+		//Open server socket
+		
+		//Await client connection
+		
+		//Create new thread for connected client
+		
+		//Store new client thread information in client list
+		
+		//Run new thread
+		
+		//Open input and output streams to and from client
+		
+		//If client is the first client to connect, assign them role of dealer
+		
+		//If dealer is already assigned, assign client role of player
+		
+		//Log new client connection to game and communication logs
+		
+		//When client connects, inform dealer that client has connected
+		
+		//Manage requests between dealer and player
+	}
 }

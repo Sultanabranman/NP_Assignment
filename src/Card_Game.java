@@ -21,11 +21,11 @@ public class Card_Game {
 		
 		if(args[0].equals(server))
 		{
-			System.out.println("Test1");
+			new Server();
 		}
 		else if(args[0].equals(client))
 		{
-			System.out.println("test2");
+			new Client();
 		}
 		else
 		{

@@ -23,4 +23,16 @@
  */
 public class Client {
 
+	public Client() 
+	{
+		//Create socket connection to the server
+		
+		//Open input and output streams to the server
+		
+		//Await role assignment from server
+		
+		//If dealer role is assigned
+		
+		//If player role is assigned
+	}
 }

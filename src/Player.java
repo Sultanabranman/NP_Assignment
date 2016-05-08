@@ -17,5 +17,23 @@
  *
  */
 public class Player {
+	
+	public Player()
+	{
+		//While Loop
+			//Wait for cards to be dealt
+			
+			//While loop
+				//When cards are received, player has option of drawing another
+				//card or standing 
+				
+				//Get player input
+				
+				//If draw a card is selected
+			
+				//If stand is selected
+			
+			//Wait on game results
+	}
 
 }

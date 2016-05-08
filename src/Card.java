@@ -10,4 +10,10 @@
 
 public class Card {
 	
+	public Card()
+	{
+		//Constructor for a card
+		
+		//Generate random card 
+	}
 }
