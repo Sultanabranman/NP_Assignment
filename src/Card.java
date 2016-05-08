@@ -8,18 +8,16 @@
  *
  */
 
-import java.util.Random;
-
 public class Card {
 	private String name;
 	private int value;
 	
 	//Constructor for a card
-	public Card()
+	public Card(int generated_int)
 	{
 		//Initialise card name and value to known safe values
-		this.name = null;
-		this.value = 0;		
+		this.setName(generated_int);
+		this.setValue(generated_int);		
 	}
 	
 	//Getter for name value
@@ -27,7 +25,8 @@ public class Card {
 		return name;
 	}
 
-	//Setter for name value
+	//Setter for name value, matches value passed in to name stored in index 
+	//with that value.
 	private void setName(int value) {
 		
 		//Array containing all possible card names
@@ -53,7 +52,7 @@ public class Card {
 		this.name = card_names[value];
 	}
 
-	//Setter for card value
+	//Setter for card value, changes Jack, Queen, and King values to 10 
 	private void setValue(int value) {
 		
 		//If card drawn is a Jack, Queen, or king, set value to 10.
@@ -71,38 +70,79 @@ public class Card {
 	public int getValue() {
 		return value;
 	}
-
-	//Draw a card. Generates a random number and assigns name and value based on
-	//generated value
-	public Card draw_card()
+	
+	//Initialise hand to be blank, used by both players and dealer
+	public static void initialise_hand(Card[] hand)
 	{
-		//Create blank card object
-		Card generated_card = new Card();
+		//For the size of hand, set all values to null
+		for(int i = 0; i < hand.length; i++)
+		{
+			hand[i] = null;
+		}
 		
-		//Generate a random number to use to set card name and value
-		int value = generate_random_value();
-		
-		//Set card name based on value generated
-		generated_card.setName(value);
-		
-		//Set card value based on value generated
-		generated_card.setValue(value);		
-		
-		//Return randomly generated card
-		return generated_card;
+		//When hand is initialised to blank, return.
+		return;
 	}
 	
-	//Method to generate a random number in range 0-12. This value is used to 
-	//determine card information
-	public int generate_random_value()
+	//Returns value of current hand
+	public static int hand_value(Card[] hand)
+	{		
+		int hand_value = 0;
+		
+		int num_aces = 0;
+		
+		for(int i = 0; i < hand.length; i++)
+		{
+			//If the current card in hand is empty
+			if(hand[i] == null)
+			{
+				break;
+			}
+			
+			if(hand[i].value == 0)
+			{
+				//increment number of aces count
+				num_aces++;
+				//Increase hand_value by 1
+				hand_value++;
+				continue;
+			}
+			
+			//Add card value to hand total.
+			hand_value += hand[i].value;
+		}
+		
+		//Convert aces to appropriate value based on current hand total
+		hand_value = convert_aces(num_aces, hand_value);		
+		
+		//Return the hand value;
+		return hand_value;
+	}
+	
+	//Determine value of aces in hand
+	public static int convert_aces(int num_aces, int hand_value)
 	{
-		//Create random number generator
-		Random randomGenerator = new Random();
+		//Maximum value before going bust
+		int MAX_HAND_VALUE = 21;
 		
-		//Generate random int in range 0-13
-		int randomInt = randomGenerator.nextInt(14);
+		//Maximum value of an ace
+		int MAX_ACE_VALUE = 11;
 		
-		//Return generated int
-		return randomInt;
+		//For the number of aces in the hand
+		for(int i = 0; i < num_aces; i++)
+		{		
+			//If converting an ace to it's maximum value increases hand total to
+			//over 21, return hand without converting more aces
+			if((hand_value + (MAX_ACE_VALUE - 1)) > MAX_HAND_VALUE)
+			{
+				return hand_value;
+			}
+			else
+			{
+				//Convert ace to equal 11
+				hand_value += (MAX_ACE_VALUE - 1);
+			}
+		}
+		return hand_value;
 	}
 }

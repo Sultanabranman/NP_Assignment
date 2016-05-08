@@ -1,6 +1,8 @@
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Random;
 
 /**
  * Manages all functions related to the Dealer role. The dealer role is 
@@ -30,36 +32,206 @@ public class Dealer {
 
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
-	private Socket socket;
+	//private Socket socket;
+	
+	//Array to hold the cards currently held by the dealer
+	private Card[] hand = new Card[5];
+	
+	//Variable containing current number of cards in hand
+	private int cards_in_hand = 0;	
 	
 	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
 			Socket socket)
 	{
+		//Store passed in data in this object
 		this.toServer = toServer;
 		this.fromServer = fromServer;
-		this.socket = socket;
-		//Wait for player connection to the game
+		//this.socket = socket;
 		
-		//When player connects to the game, start the game
+		//Main loop for dealer
+		while(true)
+		{
+			try
+			{
+				//flag to indicate if player is connected to game
+				boolean ready = false;
+				
+				//Wait for players ready command from server.
+				while(!ready)
+				{
+					//Retrieve any messages from the server
+					Object message = fromServer.readObject();
+					
+					//If player connection communicated from server 
+					if(message.equals("players ready"))
+					{
+						//Set flag to indicate that players are ready to start the 
+						//game
+						ready = true;
+					}
+				}
+				
+				//When players are ready, start the game
+				start_game();	
+			}
+			catch(IOException e)
+			{
+				System.err.println(e);
+			}
+			catch(ClassNotFoundException e)
+			{
+				System.err.println(e);
+			}
+		}		
+	}
+	
+	//Draw a card. Generates a random number and assigns name and value based on
+	//generated value
+	private Card draw_card()
+	{		
+		//Generate a random number to use to set card name and value
+		int value = generate_random_value();
 		
-		//Deal two cards to player
+		//Generate card based on generated value
+		Card generated_card = new Card(value);	
+		
+		//Return randomly generated card
+		return generated_card;
+	}
+	
+	//Method to generate a random number in range 0-12. This value is used to 
+	//determine card information
+	private int generate_random_value()
+	{
+		//Create random number generator
+		Random randomGenerator = new Random();
+		
+		//Generate random int in range 0-13
+		int randomInt = randomGenerator.nextInt(14);
+		
+		//Return generated int
+		return randomInt;
+	}
+	
+	private void start_game()
+	{
+		//Reset dealers hand at start of the game to be blank
+		Card.initialise_hand(hand);
 		
 		//Deal two cards to dealer
+		for(int i = 0; i < 2; i++)
+		{
+			//Draw card for hand
+			hand[i] = draw_card();
+			cards_in_hand++;
+		}			
 		
-		//If the player requests a card, deal card to player
+		//Flag to indicate that a game is currently running
+		boolean game_finished = false;
 		
-		//If the player goes bust, the dealer starts a new game after all 
-		//information is logged to server
-		
-		//If the player stands, dealer plays their hand
-		
-		//While Loop
-			//If the dealer's hand totals over 17, the dealer stands
+		while(!game_finished)
+		{
+			serve_players();				
 			
+			//If the player stands, dealer plays their hand
+			play_hand();				
+			
+			//Dealer evaluates cards
+			//evaluate_cards();
+			
+			//Dealer communicates results to the server.
+			communicate_results();
+		}				
+		
+	}
+	private void serve_players()
+	{
+		try
+		{		
+			//Flag to indicate players are still able to draw cards
+			boolean players_playing = true;
+			
+			//While the players have not gone bust or chosen to stand
+			while(players_playing)
+			{
+				//Retrieve messages from server
+				Object message = fromServer.readObject();
+				
+				//If the player requests a card, deal card to player					
+				if(message.equals("draw card"))
+				{
+					Card card = draw_card();
+					toServer.writeObject(card);
+				}
+				if(message.equals(""))
+				{
+					
+				}
+			}
+		}
+		catch(IOException e)
+		{
+			System.err.println(e);
+		}
+		catch(ClassNotFoundException e)
+		{
+			System.err.println(e);
+		}
+		return;
+	}
+	
+	//Automatically plays hand until hand value totals over 17 or 5 cards are
+	//held.
+	private void play_hand()
+	{
+		//Variable containing current hand's value.
+		int hand_value = Card.hand_value(hand);
+		
+		//While the dealer's hand value is under 17, and the dealer isn't 
+		//holding 5 cards
+		while((hand_value <= 17) && (cards_in_hand != 5))
+		{			
 			//If the dealer's hand totals under 17, the dealer draws a card
+			hand[cards_in_hand - 1] = draw_card();			
+			
+			//Get the current value of cards in hand
+			hand_value = Card.hand_value(hand);			
+		}
 		
-		//Dealer evaluates cards
+		//If the dealer's hand totals over 17, the dealer stands. Return		
+		return;			
+	}
+	
+	//Determine the winner by comparing each player's hand total to the dealer's
+	private void evaluate_cards(int dealer_total, int[] player_totals)
+	{
+		int MAX_HAND_VALUE = 21;
 		
-		//Dealer communicates results to the server.
+		for(int i = 0; i < player_totals.length; i++)
+		{
+			if(player_totals[i] > MAX_HAND_VALUE)
+			{
+				//Dealer wins
+			}
+			else if(dealer_total > MAX_HAND_VALUE)
+			{
+				//Player wins
+			}
+			else if(dealer_total == player_totals[i])
+			{
+				//Draw
+			}
+			else
+			{
+				//Dealer_wins
+			}
+		}
+		
+		return;
+	}
+	
+	private void communicate_results()
+	{
+		return;
 	}
 }
