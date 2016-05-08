@@ -26,34 +26,109 @@
  * @author Chris
  *
  */
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.*;
+import java.util.ArrayList;
+
 public class Server {
 
+	private final ArrayList<HandleAClient> clients = new ArrayList<>();
+	
 	public Server()
 	{
-		//Create log files
-		
 		//Create client list
 		
+		
+		//Create log files
+		
+		
+		
 		//Open server socket
+		try
+		{
+			ServerSocket serverSocket = new ServerSocket(8000);
+				
+			//Main server service loop
+			while(true)
+			{
+				//Await client connection
+				Socket socket = serverSocket.accept();
+				
+				//Log new client connection
+				
+				//Get current number of clients connected
+				int num_clients = clients.size();
+				
+				//Create new thread for connected client
+				HandleAClient task = new HandleAClient(socket, num_clients);
+				
+				//Store new client thread information in client list
+				clients.add(task);
+				
+				//Run new thread
+				new Thread(task).start();
+			}
+		}
+		catch(IOException e)
+		{
+			System.err.println(e);
+		}			
+	}
+	class HandleAClient implements Runnable
+	{
+		private Socket socket;
+		private int client_num;
 		
-		//Await client connection
+		public HandleAClient(Socket socket, int client_num)
+		{
+			this.socket = socket;
+			this.client_num = client_num;
+		}
 		
-		//Create new thread for connected client
-		
-		//Store new client thread information in client list
-		
-		//Run new thread
-		
-		//Open input and output streams to and from client
-		
-		//If client is the first client to connect, assign them role of dealer
-		
-		//If dealer is already assigned, assign client role of player
-		
-		//Log new client connection to game and communication logs
-		
-		//When client connects, inform dealer that client has connected
-		
-		//Manage requests between dealer and player
+		public synchronized void run()
+		{
+			//Client slot on server reserved for dealer
+			int dealer_slot = 0;
+			try
+			{
+				//Open input and output streams to and from client
+				ObjectInputStream inputFromClient = new ObjectInputStream(
+						socket.getInputStream());
+				
+				ObjectOutputStream outputToClient = new ObjectOutputStream(
+						socket.getOutputStream());
+				
+				//Clean any data out of output stream
+				outputToClient.flush();				
+				
+				//If client is the first client to connect, assign them role of 
+				//dealer
+				if(client_num == dealer_slot)
+				{
+					outputToClient.writeBytes("dealer");
+				}
+				//If dealer is already assigned, assign client role of player
+				else
+				{
+					outputToClient.writeBytes("player");
+					
+					//When client connects, inform dealer that client has 
+					//connected
+				}					
+				
+				//Manage requests between dealer and player
+				while(true)
+				{
+					
+				}
+			}
+			catch(IOException e)
+			{
+				System.err.println(e);
+			}
+		}
 	}
 }
