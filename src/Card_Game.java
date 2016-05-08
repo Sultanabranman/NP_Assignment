@@ -10,7 +10,40 @@
 public class Card_Game {
 
 	public static void main(String[] args) {
-
+		String server = "server";
+		String client = "client";
+		
+		if(args.length != 1)
+		{
+			invalid_args_hook();
+			return;
+		}
+		
+		if(args[0].equals(server))
+		{
+			System.out.println("Test1");
+		}
+		else if(args[0].equals(client))
+		{
+			System.out.println("test2");
+		}
+		else
+		{
+			invalid_args_hook();
+			return;
+		}
+	}
+	
+	// Method to print argument error to error stream when invalid arguments
+	//passed in. 
+	public static void invalid_args_hook()
+	{
+		System.err.println("Error: Invalid arguments.");
+		System.err.println("\t Correct format is: java Card_Game "
+				+ "<Program Type>\nWhere <Program Type> is either client "
+				+ "or server.");
+		
+		return;
 	}
 
 }
