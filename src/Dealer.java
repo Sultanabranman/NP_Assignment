@@ -1,3 +1,7 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 /**
  * Manages all functions related to the Dealer role. The dealer role is 
  * assigned automatically.
@@ -24,8 +28,16 @@
  */
 public class Dealer {
 
-	public Dealer()
+	private ObjectOutputStream toServer; 
+	private ObjectInputStream fromServer; 
+	private Socket socket;
+	
+	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
+			Socket socket)
 	{
+		this.toServer = toServer;
+		this.fromServer = fromServer;
+		this.socket = socket;
 		//Wait for player connection to the game
 		
 		//When player connects to the game, start the game

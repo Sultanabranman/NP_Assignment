@@ -1,3 +1,7 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 /**
  * Manages all functions related to the player. The player role is assigned by 
  * the server. 
@@ -18,8 +22,17 @@
  */
 public class Player {
 	
-	public Player()
+	private ObjectOutputStream toServer; 
+	private ObjectInputStream fromServer; 
+	private Socket socket;
+	
+	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, 
+			Socket socket)
 	{
+		this.toServer = toServer;
+		this.fromServer = fromServer;
+		this.socket = socket;
+		
 		//While Loop
 			//Wait for cards to be dealt
 			

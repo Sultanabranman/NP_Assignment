@@ -1,3 +1,8 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 /**
  * The Client class is a generic class that is used when client is passed in 
  * from the command line.
@@ -25,14 +30,44 @@ public class Client {
 
 	public Client() 
 	{
-		//Create socket connection to the server
-		
-		//Open input and output streams to the server
-		
-		//Await role assignment from server
-		
-		//If dealer role is assigned
-		
-		//If player role is assigned
+		try
+		{
+			//Create socket connection to the server
+			Socket socket = new Socket("localhost", 8000);
+			
+			//Open input and output streams to the server
+			ObjectInputStream fromServer = new ObjectInputStream(
+					socket.getInputStream());
+			
+			ObjectOutputStream toServer = new ObjectOutputStream(
+					socket.getOutputStream());
+			
+			//Flush any data from output stream
+			toServer.flush();			
+			
+			//Await role assignment from server
+			Object role = fromServer.readObject();
+			
+			//If dealer role is assigned
+			if(role == "dealer")
+			{
+				//Make this client dealer
+				new Dealer(toServer, fromServer, socket);
+			}
+			//If player role is assigned
+			else if(role == "player")
+			{
+				//Make this client a player
+				new Player(toServer, fromServer, socket);
+			}			
+		}
+		catch(IOException e)
+		{
+			System.err.println(e);
+		}
+		catch(ClassNotFoundException e)
+		{
+			System.err.println(e);
+		}		
 	}
 }
