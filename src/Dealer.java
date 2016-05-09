@@ -145,29 +145,22 @@ public class Dealer {
 		
 	}
 	private void serve_players()
-	{
+	{		
 		try
-		{		
+		{
 			//Flag to indicate players are still able to draw cards
 			boolean players_playing = true;
 			
 			//While the players have not gone bust or chosen to stand
 			while(players_playing)
-			{
+			{	
 				//Retrieve messages from server
 				Object message = fromServer.readObject();
 				
-				//If the player requests a card, deal card to player					
-				if(message.equals("draw card"))
-				{
-					Card card = draw_card();
-					toServer.writeObject(card);
-				}
-				if(message.equals(""))
-				{
-					
-				}
-			}
+				HandleRequest request = new HandleRequest(message);
+				
+				new Thread(request).start();
+			}			
 		}
 		catch(IOException e)
 		{
@@ -178,6 +171,33 @@ public class Dealer {
 			System.err.println(e);
 		}
 		return;
+	}
+	
+	//Thread to manage any requests received from the server. New threads are 
+	//started so that more than one request can be dealt with at a time
+	class HandleRequest implements Runnable
+	{
+		private Object message;
+		public HandleRequest(Object message)
+		{
+			this.message = message;
+		}
+		
+		public synchronized void run()
+		{
+			try
+			{		
+				//If the player requests a card, deal card to player					
+				
+				//If the server sends that all players are finished
+				
+				//Stop thread
+			}
+			catch(IOException e)
+			{
+				System.err.println(e);
+			}
+		}
 	}
 	
 	//Automatically plays hand until hand value totals over 17 or 5 cards are

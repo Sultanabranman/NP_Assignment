@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -24,29 +25,70 @@ public class Player {
 	
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
-	private Socket socket;
+	//private Socket socket;
+	
+	//Array to hold the cards currently held by the dealer
+	private Card[] hand = new Card[5];
+	
+	//Variable containing current number of cards in hand
+	private int cards_in_hand = 0;
 	
 	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, 
 			Socket socket)
 	{
 		this.toServer = toServer;
 		this.fromServer = fromServer;
-		this.socket = socket;
+		//this.socket = socket;
 		
 		//While Loop
-			//Wait for cards to be dealt
-			
-			//While loop
-				//When cards are received, player has option of drawing another
-				//card or standing 
+		while(true)
+		{	
+			try
+			{	
+				//Indicate ready state
 				
-				//Get player input
+				//Initialise hand
+				Card.initialise_hand(hand);
 				
-				//If draw a card is selected
+				//Reset number of cards in hand
+				cards_in_hand = 0;
+				
+				//Wait for cards to be dealt
+				
+				//Play hand
+				play_hand();								
+				
+				//Wait on game results
+			}
+			catch(IOException e)
+			{
+				System.err.println(e);
+			}
+			catch(ClassNotFoundException e)
+			{
+				System.err.println(e);
+			}
+		}
+	}
+	
+	//Method to play hand until player either goes bust, chooses to stand, or 
+	//has 5 cards
+	private void play_hand()
+	{
+		//Variable containing current hand's value.
+		int hand_value = Card.hand_value(hand);
+		
+		while(true)
+		{				
+			//When cards are received, player has option of drawing another
+			//card or standing 
 			
-				//If stand is selected
+			//Get player input
 			
-			//Wait on game results
+			//If draw a card is selected
+					
+			//If stand is selected
+		}		
 	}
 
 }
