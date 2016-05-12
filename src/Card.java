@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 /**
  * Holds all functions related to card information.
  * Used to generate cards when the Dealer deals to players.
@@ -8,7 +10,7 @@
  *
  */
 
-public class Card {
+public class Card implements Serializable{
 	private String name;
 	private int value;
 	
