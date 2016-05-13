@@ -19,7 +19,9 @@ public class Message implements Serializable{
 	private int target;
 	private ObjectInputStream inputStream;	
 	private ObjectOutputStream outputStream; 
-	
+	private ObjectInputStream dealerInputStream;	
+	private ObjectOutputStream dealerOutputStream; 	
+
 	public Message(int target)
 	{
 		this.target = target;
@@ -39,7 +41,7 @@ public class Message implements Serializable{
 
 	public void setInputStream(ObjectInputStream inputStream) {
 		this.inputStream = inputStream;
-	}
+	}	
 
 	public ObjectOutputStream getOutputStream() {
 		return outputStream;
@@ -47,6 +49,22 @@ public class Message implements Serializable{
 
 	public void setOutputStream(ObjectOutputStream outputStream) {
 		this.outputStream = outputStream;
+	}
+	
+	public ObjectOutputStream getDealerOutputStream() {
+		return dealerOutputStream;
+	}
+
+	public void setDealerOutputStream(ObjectOutputStream dealerOutputStream) {
+		this.dealerOutputStream = dealerOutputStream;
+	}
+	
+	public ObjectInputStream getDealerInputStream() {
+		return dealerInputStream;
+	}
+
+	public void setDealerInputStream(ObjectInputStream dealerInputStream) {
+		this.dealerInputStream = dealerInputStream;
 	}
 	
 

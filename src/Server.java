@@ -41,6 +41,8 @@ public class Server {
 	private final ArrayList<HandleAClient> clients = new ArrayList<>();
 	private int num_clients = 0;
 	private int players_ready = 0;
+	private ObjectOutputStream toDealer;
+	private ObjectInputStream fromDealer;
 	
 	public Server()
 	{
@@ -117,6 +119,9 @@ public class Server {
 					RoleAssignmentOperation role_assignment = new RoleAssignmentOperation(client_num);
 					role_assignment.setRole(Definitions.DEALER);
 					outputToClient.writeObject(role_assignment);
+					
+					toDealer = outputToClient;
+					fromDealer = inputFromClient;
 				}
 				//If dealer is already assigned, assign client role of player
 				else
@@ -134,9 +139,12 @@ public class Server {
 					
 					if(message.getTarget() == Definitions.DEALER)
 					{
-						message.setOutputStream();
-						messaage.setInputStream();
+						message.setDealerOutputStream(toDealer);
+						message.setDealerInputStream(fromDealer);
 					}
+					
+					message.setInputStream(inputFromClient);
+					message.setOutputStream(outputToClient);
 					
 					message.execute();
 				}
