@@ -44,15 +44,20 @@ public class Player {
 		{	
 			try
 			{	
-				//Indicate ready state
-				
 				//Initialise hand
 				Card.initialise_hand(hand);
 				
 				//Reset number of cards in hand
 				cards_in_hand = 0;
 				
+				//Indicate ready state
+				PlayerReadyOperation ready = new PlayerReadyOperation(Definitions.SERVER);
+				
+				toServer.writeObject(ready);
+				
 				//Wait for cards to be dealt
+				request_card();
+				request_card();
 				
 				//Play hand
 				play_hand();								
@@ -62,12 +67,27 @@ public class Player {
 			catch(IOException e)
 			{
 				System.err.println(e);
-			}
-			catch(ClassNotFoundException e)
-			{
-				System.err.println(e);
-			}
+			}			
 		}
+	}
+	
+	private Card request_card()
+	{
+		Card card = null;
+		
+		try {		
+		
+			RequestCardOperation request = new RequestCardOperation(Definitions.DEALER);
+			
+			toServer.writeObject(request);
+			
+			card = (Card) fromServer.readObject();					
+		} 
+		catch (IOException | ClassNotFoundException e) {			
+			System.err.println(e);
+		}
+		
+		return card;
 	}
 	
 	//Method to play hand until player either goes bust, chooses to stand, or 
@@ -85,6 +105,7 @@ public class Player {
 			//Get player input
 			
 			//If draw a card is selected
+			request_card();
 					
 			//If stand is selected
 		}		
