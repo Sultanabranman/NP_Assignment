@@ -121,20 +121,31 @@ public class Server {
 				//If dealer is already assigned, assign client role of player
 				else
 				{
-					outputToClient.writeBytes("player");
-					
-					//When client connects, inform dealer that client has 
-					//connected
+					RoleAssignmentOperation role_assignment = new RoleAssignmentOperation(client_num);
+					role_assignment.setRole(Definitions.PLAYER);
+					outputToClient.writeObject(role_assignment);
 				}					
 				
 				//Manage requests between dealer and player
 				while(true)
 				{
+					//Await role assignment from server
+					Message message = (Message) inputFromClient.readObject();
 					
+					if(message.getTarget() == Definitions.DEALER)
+					{
+						message.setOutputStream();
+						messaage.setInputStream();
+					}
+					
+					message.execute();
 				}
 			}
 			catch(IOException e)
 			{
+				System.err.println(e);
+			} 
+			catch (ClassNotFoundException e) {
 				System.err.println(e);
 			}
 		}

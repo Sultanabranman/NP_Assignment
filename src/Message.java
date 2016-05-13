@@ -17,21 +17,36 @@ public class Message implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private int target;
+	private ObjectInputStream inputStream;	
+	private ObjectOutputStream outputStream; 
 	
 	public Message(int target)
 	{
 		this.target = target;
-	}	
-	
+	}		
 	
 	public int getTarget() {
 		return target;
 	}
 
-
-
 	public void setTarget(int target) {
 		this.target = target;
+	}
+	
+	public ObjectInputStream getInputStream() {
+		return inputStream;
+	}
+
+	public void setInputStream(ObjectInputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+
+	public ObjectOutputStream getOutputStream() {
+		return outputStream;
+	}
+
+	public void setOutputStream(ObjectOutputStream outputStream) {
+		this.outputStream = outputStream;
 	}
 	
 

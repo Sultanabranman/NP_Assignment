@@ -46,10 +46,10 @@ public class Client {
 			toServer.flush();			
 			
 			//Await role assignment from server
-			RoleAssignmentOperation message = (RoleAssignmentOperation) fromServer.readObject();
+			Message message = (Message) fromServer.readObject();
 			
-			message.setFromServer(fromServer);
-			message.setToServer(toServer);
+			message.setOutputStream(toServer);
+			message.setInputStream(fromServer);
 			
 			message.execute();						
 		}
