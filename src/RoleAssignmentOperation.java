@@ -18,12 +18,12 @@ public class RoleAssignmentOperation extends Message{
 		if(role == Definitions.DEALER)
 		{
 			//Make this client dealer
-			new Dealer(getToServer(), getFromServer());
+			new Dealer(toServer, fromServer, getTarget());
 		}
 		else if(role == Definitions.PLAYER)
 		{
 			//Make this client a player
-			new Player(toServer, fromServer);
+			new Player(toServer, fromServer, getTarget());
 		}
 	}
 	

@@ -32,6 +32,7 @@ public class Dealer {
 
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
+	private int client_num;
 	//private Socket socket;
 	
 	//Array to hold the cards currently held by the dealer
@@ -40,12 +41,12 @@ public class Dealer {
 	//Variable containing current number of cards in hand
 	private int cards_in_hand = 0;	
 	
-	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer)
+	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, int client_num)
 	{
 		//Store passed in data in this object
 		this.toServer = toServer;
 		this.fromServer = fromServer;
-		//this.socket = socket;
+		this.client_num = client_num;
 		
 		//Main loop for dealer
 		while(true)
