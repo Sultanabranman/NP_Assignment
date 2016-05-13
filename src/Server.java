@@ -35,7 +35,12 @@ import java.util.ArrayList;
 
 public class Server {
 
+	private final int DEALER = 0;
+	private final int PLAYER = 1;
+	
 	private final ArrayList<HandleAClient> clients = new ArrayList<>();
+	private int num_clients = 0;
+	private int players_ready = 0;
 	
 	public Server()
 	{
@@ -60,7 +65,7 @@ public class Server {
 				//Log new client connection
 				
 				//Get current number of clients connected
-				int num_clients = clients.size();
+				num_clients = clients.size();
 				
 				//Create new thread for connected client
 				HandleAClient task = new HandleAClient(socket, num_clients);
@@ -70,6 +75,7 @@ public class Server {
 				
 				//Run new thread
 				new Thread(task).start();
+				
 			}
 		}
 		catch(IOException e)
@@ -108,7 +114,9 @@ public class Server {
 				//dealer
 				if(client_num == dealer_slot)
 				{
-					outputToClient.writeBytes("dealer");
+					RoleAssignmentOperation role_assignment = new RoleAssignmentOperation(client_num);
+					role_assignment.setRole(Definitions.DEALER);
+					outputToClient.writeObject(role_assignment);
 				}
 				//If dealer is already assigned, assign client role of player
 				else

@@ -33,8 +33,7 @@ public class Player {
 	//Variable containing current number of cards in hand
 	private int cards_in_hand = 0;
 	
-	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, 
-			Socket socket)
+	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer)
 	{
 		this.toServer = toServer;
 		this.fromServer = fromServer;

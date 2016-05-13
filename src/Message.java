@@ -1,3 +1,5 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /** 
@@ -11,26 +13,27 @@ import java.io.Serializable;
  *
  */
 public class Message implements Serializable{
-	private String target;
-	//Constructor for Message object
-	public Message(String target)
+	
+	private static final long serialVersionUID = 1L;
+	
+	private int target;
+	
+	public Message(int target)
 	{
 		this.target = target;
-	}
+	}	
 	
 	
-	
-	public String getTarget() {
+	public int getTarget() {
 		return target;
 	}
 
 
 
-	public void setTarget(String target) {
+	public void setTarget(int target) {
 		this.target = target;
 	}
-
-
+	
 
 	// Blank execute method to be overridden by subclasses
 	public void execute()

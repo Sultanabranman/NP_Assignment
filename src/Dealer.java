@@ -40,8 +40,7 @@ public class Dealer {
 	//Variable containing current number of cards in hand
 	private int cards_in_hand = 0;	
 	
-	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
-			Socket socket)
+	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer)
 	{
 		//Store passed in data in this object
 		this.toServer = toServer;
@@ -60,7 +59,7 @@ public class Dealer {
 				while(!ready)
 				{
 					//Retrieve any messages from the server
-					Object message = fromServer.readObject();
+					Message message = (Message) fromServer.readObject();
 					
 					//If player connection communicated from server 
 					if(message.equals("players ready"))

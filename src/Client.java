@@ -46,20 +46,12 @@ public class Client {
 			toServer.flush();			
 			
 			//Await role assignment from server
-			Object role = fromServer.readObject();
+			RoleAssignmentOperation message = (RoleAssignmentOperation) fromServer.readObject();
 			
-			//If dealer role is assigned
-			if(role == "dealer")
-			{
-				//Make this client dealer
-				new Dealer(toServer, fromServer, socket);
-			}
-			//If player role is assigned
-			else if(role == "player")
-			{
-				//Make this client a player
-				new Player(toServer, fromServer, socket);
-			}			
+			message.setFromServer(fromServer);
+			message.setToServer(toServer);
+			
+			message.execute();						
 		}
 		catch(IOException e)
 		{
