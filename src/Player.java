@@ -51,7 +51,7 @@ public class Player {
 				cards_in_hand = 0;
 				
 				//Indicate ready state
-				PlayerReadyOperation ready = new PlayerReadyOperation(Definitions.SERVER);
+				PlayerReadyOperation ready = new PlayerReadyOperation
 				
 				toServer.writeObject(ready);
 				

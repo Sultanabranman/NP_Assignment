@@ -32,6 +32,7 @@ public class Dealer {
 
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
+	protected static int start_game = Definitions.NO;
 	private int client_num;
 	//private Socket socket;
 	
@@ -41,7 +42,8 @@ public class Dealer {
 	//Variable containing current number of cards in hand
 	private int cards_in_hand = 0;	
 	
-	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, int client_num)
+	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
+			int client_num)
 	{
 		//Store passed in data in this object
 		this.toServer = toServer;
@@ -52,27 +54,26 @@ public class Dealer {
 		while(true)
 		{
 			try
-			{
-				//flag to indicate if player is connected to game
-				boolean ready = false;
-				
+			{				
 				//Wait for players ready command from server.
-				while(!ready)
+				while(start_game == Definitions.NO)
 				{
 					//Retrieve any messages from the server
 					Message message = (Message) fromServer.readObject();
 					
-					//If player connection communicated from server 
-					if(message.equals("players ready"))
+					message.setInputStream(fromServer);
+					message.setOutputStream(toServer);
+					
+					message.execute();
+					
+					//If players ready is communicated from server, start the 
+					//game 
+					if(start_game == Definitions.YES)
 					{
-						//Set flag to indicate that players are ready to start the 
-						//game
-						ready = true;
+						//When players are ready, start the game
+						start_game();
 					}
-				}
-				
-				//When players are ready, start the game
-				start_game();	
+				}					
 			}
 			catch(IOException e)
 			{
@@ -214,7 +215,7 @@ public class Dealer {
 	}
 	
 	//Determine the winner by comparing each player's hand total to the dealer's
-	private void evaluate_cards(int dealer_total, int[] player_totals)
+	protected void evaluate_cards(int dealer_total, int[] player_totals)
 	{
 		int MAX_HAND_VALUE = 21;
 		

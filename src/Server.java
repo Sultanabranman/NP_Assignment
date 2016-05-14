@@ -39,19 +39,17 @@ public class Server {
 	private final int PLAYER = 1;
 	
 	private final ArrayList<HandleAClient> clients = new ArrayList<>();
-	private int num_clients = 0;
-	private int players_ready = 0;
-	private ObjectOutputStream toDealer;
-	private ObjectInputStream fromDealer;
+	protected static int num_clients = 0;
+	protected static int players_ready = 0;
+	private static ObjectOutputStream toDealer;
+	private static ObjectInputStream fromDealer;
 	
 	public Server()
 	{
 		//Create client list
 		
 		
-		//Create log files
-		
-		
+		//Create log files		
 		
 		//Open server socket
 		try
@@ -144,16 +142,18 @@ public class Server {
 					message.setInputStream(inputFromClient);
 					message.setOutputStream(outputToClient);
 					
+					//Pass in input and output streams to the dealer to allow 
+					//message to send required data
+					message.setDealerOutputStream(toDealer);
+					message.setDealerInputStream(fromDealer);
+					
 					//Log communication stored in message
 					message.log();
 					
 					//If the target is the dealer, set the stored input and 
 					//output streams to the dealer
 					if(message.getTarget() == Definitions.DEALER)
-					{
-						message.setDealerOutputStream(toDealer);
-						message.setDealerInputStream(fromDealer);
-						
+					{						
 						toDealer.writeObject(message);
 					}	
 					//If the target of the message is the player
