@@ -67,6 +67,12 @@ public class Message implements Serializable{
 		this.dealerInputStream = dealerInputStream;
 	}
 	
+	//Blank log method to be overridden by subclasses
+	public void log()
+	{
+		
+	}
+	
 
 	// Blank execute method to be overridden by subclasses
 	public void execute()

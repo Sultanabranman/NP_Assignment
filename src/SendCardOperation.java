@@ -21,6 +21,10 @@ public class SendCardOperation extends Message{
 		this.card = card;
 	}
 
+	public void log(){
+		
+	}
+	
 	public void execute(){
 		
 	}

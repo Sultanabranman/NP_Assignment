@@ -12,6 +12,10 @@ public class RequestCardOperation extends Message{
 		super(target);
 	}
 	
+	public void log() {
+		
+	}
+	
 	public void execute() {
 		Card card = null;
 		

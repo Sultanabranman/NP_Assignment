@@ -12,6 +12,10 @@ public class PlayerReadyOperation extends Message{
 		
 	}	
 	
+	public void log() {
+		
+	}
+	
 	public void execute() {
 		
 	}

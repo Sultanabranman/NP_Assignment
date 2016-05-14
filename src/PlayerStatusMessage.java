@@ -8,8 +8,12 @@ public class PlayerStatusMessage extends Message{
 	 */
 	
 
-	public PlayerStatusMessage(String target) {
+	public PlayerStatusMessage(int target) {
 		super(target);
+		
+	}
+	
+	public void log() {
 		
 	}
 	

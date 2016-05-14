@@ -9,6 +9,10 @@ public class RoleAssignmentOperation extends Message{
 	
 	private int role;	
 	
+	public void log() {
+		
+	}
+	
 	public void execute(){
 		if(role == Definitions.DEALER)
 		{
