@@ -39,8 +39,10 @@ public class Server {
 	private final int PLAYER = 1;
 	
 	private final ArrayList<HandleAClient> clients = new ArrayList<>();
+	protected static int player_scores[] = new int[5];
 	protected static int num_clients = 0;
 	protected static int players_ready = 0;
+	protected static int players_finished = 0;
 	private static ObjectOutputStream toDealer;
 	private static ObjectInputStream fromDealer;
 	
@@ -156,16 +158,16 @@ public class Server {
 					{						
 						toDealer.writeObject(message);
 					}	
-					//If the target of the message is the player
-					else if(message.getTarget() == Definitions.PLAYER)
-					{
-						outputToClient.writeObject(message);
-					}
 					//If the message's target is the server, execute the command
 					//within the server
-					else
+					else if(message.getTarget() == Definitions.SERVER)
 					{
 						message.execute();
+					}
+					//If the target of the message is the player					
+					else
+					{						
+						outputToClient.writeObject(message);
 					}					
 				}
 			}

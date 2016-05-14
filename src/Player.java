@@ -50,19 +50,27 @@ public class Player {
 				//Reset number of cards in hand
 				cards_in_hand = 0;
 				
+				//Get user input to indicate ready status
+				String input = get_user_input();
+				
 				//Indicate ready state
-				PlayerReadyOperation ready = new PlayerReadyOperation
+				if(input == "READY")
+				{
+					PlayerReadyOperation ready = new PlayerReadyOperation
+							(Definitions.SERVER, client_num);
+					
+					toServer.writeObject(ready);
+					
+					//Wait for cards to be dealt
+					request_card();
+					request_card();
+					
+					//Play hand
+					play_hand();								
+					
+					//Wait on game results
+				}
 				
-				toServer.writeObject(ready);
-				
-				//Wait for cards to be dealt
-				request_card();
-				request_card();
-				
-				//Play hand
-				play_hand();								
-				
-				//Wait on game results
 			}
 			catch(IOException e)
 			{
@@ -71,48 +79,84 @@ public class Player {
 		}
 	}
 	
-	private Card request_card()
+	private void request_card()
 	{
-		Card card = null;
-		
 		try {		
 		
+			//Create new request for card
 			RequestCardOperation request = new RequestCardOperation
 					(Definitions.DEALER);
 			
+			//Send request to server
 			toServer.writeObject(request);
 			
+			//Receive message from the dealer containing the card
 			SendCardOperation receiveCard = (SendCardOperation) 
 					fromServer.readObject();
 			
-			card = receiveCard.getCard();					
+			//Add received card to hand
+			hand[cards_in_hand] = receiveCard.getCard();
+			
+			//Increment cards in hand
+			cards_in_hand++;
 		} 
 		catch (IOException | ClassNotFoundException e) {			
 			System.err.println(e);
 		}
 		
-		return card;
+		return;
 	}
 	
 	//Method to play hand until player either goes bust, chooses to stand, or 
 	//has 5 cards
 	private void play_hand()
 	{
+		//Flag to indicate if player's hand has gone over 21
+		boolean player_is_bust = false;
+		
 		//Variable containing current hand's value.
 		int hand_value = Card.hand_value(hand);
 		
+		//Variable containing user's input
+		String input = null;
+		
 		while(true)
-		{				
-			//When cards are received, player has option of drawing another
-			//card or standing 
-			
-			//Get player input
-			
-			//If draw a card is selected
-			request_card();
+		{
+			try
+			{				
+				//When cards are received, player has option of drawing another
+				//card or standing 
+				
+				//Get player input
+				input = get_user_input();
+				
+				//If draw a card is selected
+				if(input == "CARD")
+				{
+					request_card();
+				}				
+						
+				//If stand selected or player is bust
+				if(input == "STAND" || player_is_bust)
+				{
+					PlayerStatusMessage result = new PlayerStatusMessage
+							(Definitions.SERVER, hand_value, client_num);
 					
-			//If stand is selected
+					toServer.writeObject(result);
+				}				
+			}
+			catch(IOException e)
+			{
+				System.err.println(e);
+			}			
 		}		
+	}
+	
+	public String get_user_input()
+	{
+		String input = null;
+		
+		return input;
 	}
 
 }
