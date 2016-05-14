@@ -6,10 +6,21 @@ public class SendCardOperation extends Message{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public SendCardOperation(String target) {
-		super(target);
-	}
+	private Card card;
 	
+	public SendCardOperation(int target, Card card) {
+		super(target);
+		this.card = card;
+	}	
+	
+	public Card getCard() {
+		return card;
+	}
+
+	public void setCard(Card card) {
+		this.card = card;
+	}
+
 	public void execute(){
 		
 	}

@@ -116,7 +116,8 @@ public class Server {
 				//dealer
 				if(client_num == dealer_slot)
 				{
-					RoleAssignmentOperation role_assignment = new RoleAssignmentOperation(client_num);
+					RoleAssignmentOperation role_assignment = new 
+							RoleAssignmentOperation(client_num);
 					role_assignment.setRole(Definitions.DEALER);
 					outputToClient.writeObject(role_assignment);
 					
@@ -126,7 +127,8 @@ public class Server {
 				//If dealer is already assigned, assign client role of player
 				else
 				{
-					RoleAssignmentOperation role_assignment = new RoleAssignmentOperation(client_num);
+					RoleAssignmentOperation role_assignment = new 
+							RoleAssignmentOperation(client_num);
 					role_assignment.setRole(Definitions.PLAYER);
 					outputToClient.writeObject(role_assignment);
 				}					
@@ -137,16 +139,34 @@ public class Server {
 					//Await role assignment from server
 					Message message = (Message) inputFromClient.readObject();
 					
+					//Pass in input and output streams to the client to allow 
+					//message to send required data
+					message.setInputStream(inputFromClient);
+					message.setOutputStream(outputToClient);
+					
+					//Log communication stored in message
+					message.log();
+					
+					//If the target is the dealer, set the stored input and 
+					//output streams to the dealer
 					if(message.getTarget() == Definitions.DEALER)
 					{
 						message.setDealerOutputStream(toDealer);
 						message.setDealerInputStream(fromDealer);
+						
+						toDealer.writeObject(message);
+					}	
+					//If the target of the message is the player
+					else if(message.getTarget() == Definitions.PLAYER)
+					{
+						outputToClient.writeObject(message);
 					}
-					
-					message.setInputStream(inputFromClient);
-					message.setOutputStream(outputToClient);
-					
-					message.execute();
+					//If the message's target is the server, execute the command
+					//within the server
+					else
+					{
+						message.execute();
+					}					
 				}
 			}
 			catch(IOException e)

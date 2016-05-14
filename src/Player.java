@@ -77,11 +77,15 @@ public class Player {
 		
 		try {		
 		
-			RequestCardOperation request = new RequestCardOperation(Definitions.DEALER);
+			RequestCardOperation request = new RequestCardOperation
+					(Definitions.DEALER);
 			
 			toServer.writeObject(request);
 			
-			card = (Card) fromServer.readObject();					
+			SendCardOperation receiveCard = (SendCardOperation) 
+					fromServer.readObject();
+			
+			card = receiveCard.getCard();					
 		} 
 		catch (IOException | ClassNotFoundException e) {			
 			System.err.println(e);

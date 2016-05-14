@@ -87,7 +87,7 @@ public class Dealer {
 	
 	//Draw a card. Generates a random number and assigns name and value based on
 	//generated value
-	private Card draw_card()
+	protected static Card draw_card()
 	{		
 		//Generate a random number to use to set card name and value
 		int value = generate_random_value();
@@ -101,7 +101,7 @@ public class Dealer {
 	
 	//Method to generate a random number in range 0-12. This value is used to 
 	//determine card information
-	private int generate_random_value()
+	private static int generate_random_value()
 	{
 		//Create random number generator
 		Random randomGenerator = new Random();
@@ -155,7 +155,7 @@ public class Dealer {
 			while(players_playing)
 			{	
 				//Retrieve messages from server
-				Object message = fromServer.readObject();
+				Message message = (Message) fromServer.readObject();
 				
 				HandleRequest request = new HandleRequest(message);
 				
@@ -177,26 +177,17 @@ public class Dealer {
 	//started so that more than one request can be dealt with at a time
 	class HandleRequest implements Runnable
 	{
-		private Object message;
-		public HandleRequest(Object message)
+		private Message message;
+		public HandleRequest(Message message)
 		{
 			this.message = message;
 		}
 		
 		public synchronized void run()
-		{
-			try
-			{		
-				//If the player requests a card, deal card to player					
-				
-				//If the server sends that all players are finished
-				
-				//Stop thread
-			}
-			catch(IOException e)
-			{
-				System.err.println(e);
-			}
+		{					
+			message.setOutputStream(toServer);
+			message.setInputStream(fromServer);
+			message.execute();			
 		}
 	}
 	
