@@ -52,15 +52,23 @@ public class Player {
 				//Reset number of cards in hand
 				cards_in_hand = 0;
 				
+				System.out.println("Please enter 'Ready' to indicate sign up "
+						+ "for next game");
+				
 				//Get user input to indicate ready status
 				String input = get_user_input();
+				
+				//Convert all input characters to uppercase
+				input.toUpperCase();
 				
 				//Indicate ready state
 				if(input == "READY")
 				{
+					//Create new ready message to send to server
 					PlayerReadyOperation ready = new PlayerReadyOperation
 							(Definitions.SERVER, client_num);
 					
+					//Send ready message to server
 					toServer.writeObject(ready);
 					
 					//Wait for cards to be dealt
@@ -72,7 +80,10 @@ public class Player {
 					
 					//Wait on game results
 				}
-				
+				else
+				{
+					System.out.println("Invalid input entered");
+				}				
 			}
 			catch(IOException e)
 			{
@@ -115,6 +126,7 @@ public class Player {
 	{
 		//Flag to indicate if player's hand has gone over 21
 		boolean player_is_bust = false;
+		boolean stand = false;
 		
 		//Variable containing current hand's value.
 		int hand_value = Card.hand_value(hand);
@@ -128,24 +140,48 @@ public class Player {
 			{				
 				//When cards are received, player has option of drawing another
 				//card or standing 
-				
-				//Get player input
-				input = get_user_input();
-				
-				//If draw a card is selected
-				if(input == "CARD")
+				while(stand == false || player_is_bust == false || 
+						cards_in_hand != 5)
 				{
-					request_card();
-				}				
-						
-				//If stand selected or player is bust
-				if(input == "STAND" || player_is_bust)
-				{
-					PlayerStatusMessage result = new PlayerStatusMessage
-							(Definitions.SERVER, hand_value, client_num);
+					Card.display_hand(hand);
 					
-					toServer.writeObject(result);
-				}				
+					//Print out hand total
+					System.out.printf("Current hand total: %d\n", 
+							Card.hand_value(hand));
+					
+					System.out.println("Please select one of the following "
+							+ "options");
+					System.out.println("1. Hit");
+					System.out.println("2. Stand");
+					
+					//Get player input
+					input = get_user_input();
+					
+					//If draw a card is selected, send a request to the dealer 
+					//to draw a card
+					if(Integer.parseInt(input) == 1)
+					{
+						request_card();
+					}
+					//If stand is selected, set flag to indicate so
+					else if(Integer.parseInt(input) == 2)
+					{
+						stand = true;
+					}
+					//If an invalid option is selected, print error message
+					else
+					{
+						System.out.println("Invalid option selcted");
+						System.out.println();
+					}
+				}								
+						
+				//If stand selected, player is bust, or the player has 5 cards, 
+				//pass hand total to the server				
+				PlayerStatusMessage result = new PlayerStatusMessage
+						(Definitions.SERVER, hand_value, client_num);
+				
+				toServer.writeObject(result);								
 			}
 			catch(IOException e)
 			{

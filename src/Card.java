@@ -147,4 +147,25 @@ public class Card implements Serializable{
 		}
 		return hand_value;
 	}
+	
+	//Method to show cards currently in hand
+	public static void display_hand(Card[] hand)
+	{
+		//Loop counter
+		int i = 0;
+		
+		System.out.println("Cards in hand: ");
+				
+		while(hand[i] != null)
+		{
+			//Display card name
+			System.out.println(hand[i].name);
+			//Print line for formatting
+			System.out.println();
+			//Increment loop counter
+			i++;
+		}
+		
+		return;
+	}
 }
