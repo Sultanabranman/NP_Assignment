@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -152,9 +154,27 @@ public class Player {
 		}		
 	}
 	
+	//Method to obtain user input using buffered input reader
 	public String get_user_input()
 	{
 		String input = null;
+		
+		try {
+			//Open input stream reader
+			InputStreamReader is = new InputStreamReader(System.in);
+			
+			//Open buffered reader 
+			BufferedReader buf_in = new BufferedReader(is);				
+		
+			input = buf_in.readLine();
+			
+			//Close input readers
+			buf_in.close();
+			is.close();
+		} 
+		catch (IOException e) {
+			System.err.println(e);
+		}
 		
 		return input;
 	}
