@@ -39,7 +39,7 @@ public class Server {
 	private final int PLAYER = 1;
 	
 	//Create client list
-	private final ArrayList<HandleAClient> clients = new ArrayList<>();
+	protected static final ArrayList<HandleAClient> clients = new ArrayList<>();
 	protected static int player_scores[] = new int[5];
 	protected static int num_clients = 0;
 	protected static int players_ready = 0;
@@ -92,23 +92,38 @@ public class Server {
 		private Socket socket;
 		private int client_num;
 		
+		private ObjectInputStream inputFromClient = null;
+		private ObjectOutputStream outputToClient = null;
+		
 		public HandleAClient(Socket socket, int client_num)
 		{
 			this.socket = socket;
 			this.client_num = client_num;
 		}
 		
-		public synchronized void run()
+		//Method to allow other threads to output to this client
+		public void write(Message message)
 		{
-			
+			try
+			{
+				outputToClient.writeObject(message);
+			}
+			catch(IOException ex)
+			{
+				System.err.println(ex);
+			}
+		}
+		
+		public synchronized void run()
+		{			
 			try
 			{
 				//Open input and output streams to and from client
-				ObjectInputStream inputFromClient = new ObjectInputStream(
-						socket.getInputStream());
+				inputFromClient = new ObjectInputStream
+						(socket.getInputStream());
 				
-				ObjectOutputStream outputToClient = new ObjectOutputStream(
-						socket.getOutputStream());
+				outputToClient = new ObjectOutputStream
+						(socket.getOutputStream());
 				
 				//Clean any data out of output stream
 				outputToClient.flush();				

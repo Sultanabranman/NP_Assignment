@@ -9,7 +9,14 @@ public class StartGameOperation extends Message{
 	
 	public void execute()
 	{
-		Dealer.start_game = Definitions.YES;
+		if(getTarget() == Definitions.DEALER)
+		{
+			Dealer.start_game = Definitions.YES;
+		}
+		else
+		{
+			Player.game_started = true;
+		}		
 	}
 	
 	public void log()

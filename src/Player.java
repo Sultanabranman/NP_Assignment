@@ -27,7 +27,15 @@ public class Player {
 	
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
+	
+	protected static boolean game_started = false;
+	
 	private int client_num;
+	//Open input stream reader
+	private InputStreamReader is = new InputStreamReader(System.in);
+	
+	//Open buffered reader 
+	private BufferedReader buf_in = new BufferedReader(is);	
 	
 	//Array to hold the cards currently held by the dealer
 	private Card[] hand = new Card[5];
@@ -35,7 +43,8 @@ public class Player {
 	//Variable containing current number of cards in hand
 	private int cards_in_hand = 0;
 	
-	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, int client_num)
+	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, 
+			int client_num)
 	{
 		this.toServer = toServer;
 		this.fromServer = fromServer;
@@ -58,24 +67,28 @@ public class Player {
 						+ "for next game");
 				
 				//Get user input to indicate ready status
-				String input = get_user_input();
-				
-				//Convert all input characters to uppercase
-				input.toUpperCase();
+				String input = get_user_input();				
 				
 				//Indicate ready state
-				if(input == "READY")
+				if(input.equals("READY"))
 				{
 					//Create new ready message to send to server
 					PlayerReadyOperation ready = new PlayerReadyOperation
-							(Definitions.SERVER, client_num);
+							(Definitions.SERVER);
 					
 					//Send ready message to server
 					toServer.writeObject(ready);
 					
+					//NOTE: PUT WAIT HERE
+					while(game_started == false)
+					{
+						Message start_game = (Message) fromServer.readObject();
+						start_game.execute();
+					}
+					
 					//Wait for cards to be dealt
-					request_card();
-					request_card();
+					//request_card();
+					//request_card();
 					
 					//Play hand
 					play_hand();								
@@ -90,6 +103,8 @@ public class Player {
 			catch(IOException e)
 			{
 				System.err.println(e);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 			}			
 		}
 	}
@@ -188,6 +203,13 @@ public class Player {
 			catch(IOException e)
 			{
 				System.err.println(e);
+				//Close input readers
+				try {
+					buf_in.close();
+					is.close();
+				} catch (IOException ex) {
+					e.printStackTrace();
+				}
 			}			
 		}		
 	}
@@ -195,24 +217,17 @@ public class Player {
 	//Method to obtain user input using buffered input reader
 	public String get_user_input()
 	{
-		String input = null;
+		String input = null;		
 		
-		try {
-			//Open input stream reader
-			InputStreamReader is = new InputStreamReader(System.in);
-			
-			//Open buffered reader 
-			BufferedReader buf_in = new BufferedReader(is);				
-		
+		try {		
 			input = buf_in.readLine();
 			
-			//Close input readers
-			buf_in.close();
-			is.close();
+			//Convert all input characters to uppercase
+			input = input.toUpperCase();						
 		} 
 		catch (IOException e) {
 			System.err.println(e);
-		}
+		}		
 		
 		return input;
 	}
