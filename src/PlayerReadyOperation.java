@@ -1,3 +1,6 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 
 public class PlayerReadyOperation extends Message{
 	
@@ -11,11 +14,13 @@ public class PlayerReadyOperation extends Message{
 		
 	}
 	
-	public void execute() {
+	public void execute(ObjectOutputStream out, ObjectInputStream in) {
 		Server.players_ready++;
 		
 		if(Server.players_ready == (Server.num_clients - 1))
 		{
+			System.out.println("All players ready");
+			
 			StartGameOperation dealer_start = new StartGameOperation
 					(Definitions.DEALER);
 			StartGameOperation start = new StartGameOperation

@@ -1,9 +1,9 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 
 public class SendCardOperation extends Message{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private Card card;
@@ -25,7 +25,7 @@ public class SendCardOperation extends Message{
 		
 	}
 	
-	public void execute(){
+	public void execute(ObjectOutputStream out, ObjectInputStream in){
 		
 	}
 

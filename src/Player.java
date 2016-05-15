@@ -83,12 +83,14 @@ public class Player {
 					while(game_started == false)
 					{
 						Message start_game = (Message) fromServer.readObject();
-						start_game.execute();
+						start_game.execute(toServer, fromServer);
 					}
 					
+					System.out.println("Game started");
+					
 					//Wait for cards to be dealt
-					//request_card();
-					//request_card();
+					request_card();
+					request_card();
 					
 					//Play hand
 					play_hand();								
@@ -115,7 +117,7 @@ public class Player {
 		
 			//Create new request for card
 			RequestCardOperation request = new RequestCardOperation
-					(Definitions.DEALER);
+					(Definitions.DEALER, client_num);
 			
 			//Send request to server
 			toServer.writeObject(request);

@@ -1,3 +1,6 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 
 public class StartGameOperation extends Message{
 
@@ -7,7 +10,7 @@ public class StartGameOperation extends Message{
 		super(target);
 	}
 	
-	public void execute()
+	public void execute(ObjectOutputStream out, ObjectInputStream in)
 	{
 		if(getTarget() == Definitions.DEALER)
 		{

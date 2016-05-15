@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.Random;
 
 /**
@@ -63,15 +62,13 @@ public class Dealer {
 					//Retrieve any messages from the server
 					Message message = (Message) fromServer.readObject();
 					
-					message.setInputStream(fromServer);
-					message.setOutputStream(toServer);
-					
-					message.execute();
+					message.execute(toServer, fromServer);
 					
 					//If players ready is communicated from server, start the 
 					//game 
 					if(start_game == Definitions.YES)
 					{
+						System.out.println("Game started");
 						//When players are ready, start the game
 						start_game();
 					}
@@ -79,11 +76,11 @@ public class Dealer {
 			}
 			catch(IOException e)
 			{
-				System.err.println(e);
+				e.printStackTrace();
 			}
 			catch(ClassNotFoundException e)
 			{
-				System.err.println(e);
+				e.printStackTrace();
 			}
 		}		
 	}
@@ -167,11 +164,11 @@ public class Dealer {
 		}
 		catch(IOException e)
 		{
-			System.err.println(e);
+			e.printStackTrace();
 		}
 		catch(ClassNotFoundException e)
 		{
-			System.err.println(e);
+			e.printStackTrace();
 		}
 		return;
 	}
@@ -188,9 +185,7 @@ public class Dealer {
 		
 		public synchronized void run()
 		{					
-			message.setOutputStream(toServer);
-			message.setInputStream(fromServer);
-			message.execute();			
+			message.execute(toServer, fromServer);			
 		}
 	}
 	

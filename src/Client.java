@@ -57,10 +57,7 @@ public class Client {
 			//Await role assignment from server
 			Message message = (Message) fromServer.readObject();
 			
-			message.setOutputStream(toServer);
-			message.setInputStream(fromServer);
-			
-			message.execute();						
+			message.execute(toServer, fromServer);						
 		}
 		catch(IOException e)
 		{

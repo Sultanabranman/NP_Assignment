@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 
 public class PlayerStatusMessage extends Message{
@@ -35,7 +37,7 @@ public class PlayerStatusMessage extends Message{
 		
 	}
 	
-	public void execute() {
+	public void execute(ObjectOutputStream out, ObjectInputStream in) {
 		try {
 			//Increment the number of players finished
 			Server.players_finished++;
@@ -52,7 +54,7 @@ public class PlayerStatusMessage extends Message{
 				
 				//Send message through to dealer to evaluate the game based on 
 				//scores sent with message
-				getDealerOutputStream().writeObject(totals);
+				out.writeObject(totals);
 			}
 			
 		} catch (IOException e) {

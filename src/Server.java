@@ -78,6 +78,9 @@ public class Server {
 				//Store new client thread information in client list
 				clients.add(task);
 				
+				//Get current number of clients connected
+				num_clients = clients.size();
+				
 				//Run new thread
 				new Thread(task).start();				
 			}
@@ -128,33 +131,20 @@ public class Server {
 				//Clean any data out of output stream
 				outputToClient.flush();				
 				
-				System.out.println("Assgining client role");
+				System.out.println("Assigning client role");
 				
 				RequestRoleOperation request = (RequestRoleOperation) 
 						inputFromClient.readObject();
 				
 				//Pass in client number for request to use
-				request.setTarget(client_num);
-				request.setOutputStream(outputToClient);
-				request.setInputStream(inputFromClient);
-				
-				request.execute();								
+				request.setTarget(client_num);				
+				request.execute(outputToClient, inputFromClient);				
 				
 				//Manage requests between dealer and player
 				while(true)
 				{
 					//Await request from client
 					Message message = (Message) inputFromClient.readObject();
-					
-					//Pass in input and output streams to the client to allow 
-					//message to send required data
-					message.setInputStream(inputFromClient);
-					message.setOutputStream(outputToClient);
-					
-					//Pass in input and output streams to the dealer to allow 
-					//message to send required data
-					message.setDealerOutputStream(toDealer);
-					message.setDealerInputStream(fromDealer);
 					
 					//Log communication stored in message
 					message.log();
@@ -169,21 +159,21 @@ public class Server {
 					//within the server
 					else if(message.getTarget() == Definitions.SERVER)
 					{
-						message.execute();
+						message.execute(outputToClient, inputFromClient);
 					}
 					//If the target of the message is the player					
 					else
 					{						
-						outputToClient.writeObject(message);
+						clients.get(message.getTarget()).write(message);
 					}					
 				}
 			}
 			catch(IOException e)
 			{
-				System.err.println(e);
+				e.printStackTrace();
 			} 
 			catch (ClassNotFoundException e) {
-				System.err.println(e);
+				e.printStackTrace();
 			}
 		}
 	}

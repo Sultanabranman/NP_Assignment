@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 
 public class RequestRoleOperation extends Message{
@@ -9,7 +11,7 @@ public class RequestRoleOperation extends Message{
 		super(target);
 	}
 	
-	public void execute(){
+	public void execute(ObjectOutputStream out, ObjectInputStream in){
 		int client_num = getTarget();
 		
 		try {
@@ -20,10 +22,10 @@ public class RequestRoleOperation extends Message{
 				RoleAssignmentOperation role_assignment = new 
 						RoleAssignmentOperation(client_num);
 				role_assignment.setRole(Definitions.DEALER);
-				getOutputStream().writeObject(role_assignment);
+				out.writeObject(role_assignment);
 				
-				Server.toDealer = getOutputStream();
-				Server.fromDealer = getInputStream();
+				Server.toDealer = out;
+				Server.fromDealer = in;
 				
 				System.out.println("Dealer role assgined");
 			}
@@ -34,7 +36,7 @@ public class RequestRoleOperation extends Message{
 						RoleAssignmentOperation(client_num);
 				role_assignment.setRole(Definitions.PLAYER);
 				
-				getOutputStream().writeObject(role_assignment);
+				out.writeObject(role_assignment);
 				
 				
 				System.out.println("Player role assigned");

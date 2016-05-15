@@ -1,3 +1,6 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 
 public class RoleAssignmentOperation extends Message{
 	
@@ -13,16 +16,16 @@ public class RoleAssignmentOperation extends Message{
 		
 	}
 	
-	public void execute(){
+	public void execute(ObjectOutputStream out, ObjectInputStream in){
 		if(role == Definitions.DEALER)
 		{
 			//Make this client dealer
-			new Dealer(getOutputStream(), getInputStream(), getTarget());
+			new Dealer(out, in, getTarget());
 		}
 		else if(role == Definitions.PLAYER)
 		{
 			//Make this client a player
-			new Player(getOutputStream(), getInputStream(), getTarget());
+			new Player(out, in, getTarget());
 		}
 	}
 	
