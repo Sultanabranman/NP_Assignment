@@ -156,17 +156,17 @@ public class Card implements Serializable{
 		//Loop counter
 		int i = 0;
 		
-		System.out.println("Cards in hand: ");
+		System.out.printf("Cards in hand: ");
 				
 		while(hand[i] != null)
 		{
 			//Display card name
-			System.out.println(hand[i].name);
-			//Print line for formatting
-			System.out.println();
+			System.out.printf("%s, ",hand[i].name);
 			//Increment loop counter
 			i++;
 		}
+		//Add newline character to the end of the output
+		System.out.print("\n");
 		
 		return;
 	}

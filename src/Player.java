@@ -159,7 +159,7 @@ public class Player {
 			{				
 				//When cards are received, player has option of drawing another
 				//card or standing 
-				while(stand == false || player_is_bust == false || 
+				while(stand == false && player_is_bust == false && 
 						cards_in_hand != 5)
 				{
 					Card.display_hand(hand);
@@ -167,6 +167,9 @@ public class Player {
 					//Print out hand total
 					System.out.printf("Current hand total: %d\n", 
 							Card.hand_value(hand));
+					
+					//Print line for formatting
+					System.out.println();
 					
 					System.out.println("Please select one of the following "
 							+ "options");
@@ -181,6 +184,13 @@ public class Player {
 					if(Integer.parseInt(input) == 1)
 					{
 						request_card();
+						
+						//Check to see if player is bust
+						if(Card.hand_value(hand) > 21)
+						{
+							//Set flag to indicate player is bust
+							player_is_bust = true;
+						}
 					}
 					//If stand is selected, set flag to indicate so
 					else if(Integer.parseInt(input) == 2)
@@ -193,7 +203,9 @@ public class Player {
 						System.out.println("Invalid option selcted");
 						System.out.println();
 					}
-				}								
+				}
+				
+				System.out.println("Finished");
 						
 				//If stand selected, player is bust, or the player has 5 cards, 
 				//pass hand total to the server				
