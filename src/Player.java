@@ -25,17 +25,17 @@ import java.net.Socket;
  */
 public class Player {
 	
+	//Variable to store input and output streams to the server
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
 	
+	//Variable indicating if the game has started, set to true by message 
+	//received from the server
 	protected static boolean game_started = false;
 	
+	//Variable storing this client's client numbers, used to identify client on
+	//server's end
 	private int client_num;
-	//Open input stream reader
-	private InputStreamReader is = new InputStreamReader(System.in);
-	
-	//Open buffered reader 
-	private BufferedReader buf_in = new BufferedReader(is);	
 	
 	//Array to hold the cards currently held by the dealer
 	private Card[] hand = new Card[5];
@@ -43,72 +43,200 @@ public class Player {
 	//Variable containing current number of cards in hand
 	private int cards_in_hand = 0;
 	
+	//Open input stream reader
+	private InputStreamReader is = new InputStreamReader(System.in);
+	
+	//Open buffered reader 
+	private BufferedReader buf_in = new BufferedReader(is);		
+	
+	//Constructor for the player class, takes input and output streams set up 
+	//when client was created as parameters. Also requires client identification
+	//number 
 	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, 
 			int client_num)
 	{
+		//Store passed in variables to allow class methods access to them
 		this.toServer = toServer;
 		this.fromServer = fromServer;
 		this.client_num = client_num;
 		
+		//Identify that the player role has been assigned
 		System.out.println("Player role Assigned");
 		
-		//While Loop
+		//Start the main player management method
 		while(true)
-		{	
-			try
-			{	
-				//Initialise hand
-				Card.initialise_hand(hand);
-				
-				//Reset number of cards in hand
-				cards_in_hand = 0;
-				
-				System.out.println("Please enter 'Ready' to indicate sign up "
-						+ "for next game");
-				
-				//Get user input to indicate ready status
-				String input = get_user_input();				
-				
-				//Indicate ready state
-				if(input.equals("READY"))
+		{
+			manage_player();
+		}			
+	}
+	
+	//Main loop for the player class, manages all functions required of the 
+	//class. This function isn't left until client quits
+	private void manage_player()
+	{	
+		//Initialise_player
+		initialise_player();	
+		
+		//Prompt player for input if they wish to join the game, player can
+		//also exit within this method
+		get_player_ready_status();		
+		
+		//Sends the player's ready status to the server for processing
+		send_ready_status();	
+		
+		//Wait for the game to start
+		wait_for_start();					
+		
+		//When game has started, request initial hand (2 cards)
+		request_starting_hand();
+		
+		//Play through hand until player is either bust, has chosen to 
+		//stand, or has 5 cards in hand
+		play_hand();								
+		
+		//Get game results from the server and notify the player
+		get_game_results();			
+	}
+	
+	//Method to reset all variables back to default state when starting a 
+	//new game
+	private void initialise_player()
+	{
+		//Initialise hand
+		Card.initialise_hand(hand);
+		
+		//Reset number of cards in hand
+		cards_in_hand = 0;
+		
+		return;
+	}
+	
+	//Method to prompt player to either join or leave the game, return only if 
+	//the player selects ready
+	private void get_player_ready_status()
+	{
+		//Variable to store player input
+		String input = null;
+		
+		//Flag indicating if the input acquired from the user was valid
+		boolean input_valid = false;
+		
+		//Loop until a valid input is received
+		while(input_valid == false)
+		{
+			//Display menu options
+			display_ready_options();
+			
+			//Get user input to indicate ready status
+			input = get_user_input();
+			
+			//Convert input into an integer
+			int input_num = Integer.parseInt(input);
+			
+			//Perform function based on user input
+			switch (input_num)
+			{
+				//User selects ready
+				case 1: 
 				{
-					//Create new ready message to send to server
-					PlayerReadyOperation ready = new PlayerReadyOperation
-							(Definitions.SERVER);
-					
-					//Send ready message to server
-					toServer.writeObject(ready);
-					
-					//NOTE: PUT WAIT HERE
-					while(game_started == false)
-					{
-						Message start_game = (Message) fromServer.readObject();
-						start_game.execute(toServer, fromServer);
-					}
-					
-					System.out.println("Game started");
-					
-					//Wait for cards to be dealt
-					request_card();
-					request_card();
-					
-					//Play hand
-					play_hand();								
-					
-					//Wait on game results
+					//Indicate that the input was valid
+					input_valid = true;
+					break;
 				}
-				else
+				//User selects to exit the game
+				case 2:
+				{
+					//Indicate that the input was valid
+					input_valid = true;
+					
+					//Close the client
+					System.exit(1);
+					break;
+				}
+				default:
 				{
 					System.out.println("Invalid input entered");
-				}				
+					break;
+				}
 			}
-			catch(IOException e)
+		}		
+		
+		return;
+	}
+	
+	//Method to display options available to player when getting ready status
+	private void display_ready_options()
+	{
+		//Display options for player to sign up or leave
+		System.out.println("Please select one of the following options: ");
+		System.out.println("1. Sign up for game");
+		System.out.println("2. Exit");
+		
+		return;
+	}
+	
+	//This method sends a message to the server indicating that the player 
+	//wishes to sign up
+	private void send_ready_status()
+	{
+		try
+		{
+			//Create new ready message to send to server
+			PlayerReadyOperation ready = new PlayerReadyOperation
+					(Definitions.SERVER);
+			
+			//Send ready message to server
+			toServer.writeObject(ready);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return;			
+	}
+	
+	//Method that delays player method until the game started command is 
+	//received from the server
+	private void wait_for_start()
+	{
+		while(game_started == false)
+		{
+			//Message object to store any received messages from the server
+			Message start_game = null;
+			
+			try 
 			{
-				System.err.println(e);
-			} catch (ClassNotFoundException e) {
+				//Read in any messages received from the server
+				start_game = (Message) fromServer.readObject();
+				//Execute the method contained within the message
+				start_game.execute(toServer, fromServer);
+			} 
+			catch (ClassNotFoundException e) 
+			{				
+				e.printStackTrace();
+			} 
+			catch (IOException e) 
+			{				
 				e.printStackTrace();
 			}			
-		}
+		}	
+		
+		//Print to the console that the game has started
+		System.out.println("Game started");
+		
+		//Return when a start game command is received
+		return;
+	}
+	
+	//Method to request 2 cards from dealer to obtain starting hand, adds 2 
+	//cards to hand
+	private void request_starting_hand()
+	{
+		request_card();
+		request_card();
+		
+		return;
 	}
 	
 	private void request_card()
@@ -145,87 +273,139 @@ public class Player {
 	{
 		//Flag to indicate if player's hand has gone over 21
 		boolean player_is_bust = false;
+		
+		//Flag to indicate if the player has chosen to stand
 		boolean stand = false;
 		
 		//Variable containing current hand's value.
 		int hand_value = Card.hand_value(hand);
 		
 		//Variable containing user's input
-		String input = null;
-		
-		while(true)
-		{
-			try
-			{				
-				//When cards are received, player has option of drawing another
-				//card or standing 
-				while(stand == false && player_is_bust == false && 
-						cards_in_hand != 5)
+		String input = null;		
+					
+		//When cards are received, player has option of drawing another
+		//card or standing 
+		while((stand == false) && (player_is_bust == false) && 
+				(cards_in_hand != 5))
+		{		
+			//Prints the player's current hand information to the console
+			display_current_state();			
+			
+			//Print the user's options to the console
+			display_hand_options();				
+			
+			
+			//Get player input
+			input = get_user_input();
+			
+			//Convert player input to an integer
+			int input_num = Integer.parseInt(input);
+			
+			switch(input_num)
+			{
+				//If draw a card is selected, send a request to the dealer 
+				//to draw a card
+				case 1:
 				{
-					Card.display_hand(hand);
+					request_card();
 					
-					//Print out hand total
-					System.out.printf("Current hand total: %d\n", 
-							Card.hand_value(hand));
-					
-					//Print line for formatting
-					System.out.println();
-					
-					System.out.println("Please select one of the following "
-							+ "options");
-					System.out.println("1. Hit");
-					System.out.println("2. Stand");
-					
-					//Get player input
-					input = get_user_input();
-					
-					//If draw a card is selected, send a request to the dealer 
-					//to draw a card
-					if(Integer.parseInt(input) == 1)
+					//Check to see if player is bust
+					if(Card.hand_value(hand) > 21)
 					{
-						request_card();
-						
-						//Check to see if player is bust
-						if(Card.hand_value(hand) > 21)
-						{
-							//Set flag to indicate player is bust
-							player_is_bust = true;
-						}
+						//Set flag to indicate player is bust
+						player_is_bust = true;
 					}
-					//If stand is selected, set flag to indicate so
-					else if(Integer.parseInt(input) == 2)
-					{
-						stand = true;
-					}
-					//If an invalid option is selected, print error message
-					else
-					{
-						System.out.println("Invalid option selcted");
-						System.out.println();
-					}
+					
+					break;
 				}
-				
-				System.out.println("Finished");
-						
+				//If stand is selected, set flag to indicate so
+				case 2:
+				{
+					stand = true;
+					break;
+				}
+				default:
+				{
+					System.out.println("Invalid option selcted");
+					System.out.println();
+					break;
+				}
+			}							
+			
+			try
+			{					
 				//If stand selected, player is bust, or the player has 5 cards, 
 				//pass hand total to the server				
 				PlayerStatusMessage result = new PlayerStatusMessage
 						(Definitions.SERVER, hand_value, client_num);
 				
-				toServer.writeObject(result);								
+				toServer.writeObject(result);		
+				
+				return;
 			}
 			catch(IOException e)
 			{
 				System.err.println(e);
 				//Close input readers
-				try {
+				try 
+				{
 					buf_in.close();
 					is.close();
-				} catch (IOException ex) {
+				} 
+				catch (IOException ex) 
+				{
 					e.printStackTrace();
 				}
-			}			
-		}		
+			}		
+		}
+	}
+
+	private void display_hand_options()
+	{
+		System.out.println("Please select one of the following "
+				+ "options");
+		System.out.println("1. Hit");
+		System.out.println("2. Stand");
+		
+		return;
+	}
+	
+	//Prints the player's current hand information to the console
+	private void display_current_state()
+	{
+		//Print the player's current hand to the console
+		Card.display_hand(hand);
+		
+		//Print current hand's total to the console
+		System.out.printf("Current hand total: %d\n", 
+				Card.hand_value(hand));
+		
+		//Print blank line for formatting
+		System.out.println();
+		
+		return;
+	}
+	
+	//This methods receives the game's results from the server and notifies 
+	//the player
+	private void get_game_results()
+	{
+		try
+		{		
+			//Wait on game results
+			Message status = (Message) fromServer.readObject();
+			
+			//Execute message received from server
+			status.execute(toServer, fromServer);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch(ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	//Method to obtain user input using buffered input reader
