@@ -41,6 +41,8 @@ public class Player {
 		this.fromServer = fromServer;
 		this.client_num = client_num;
 		
+		System.out.println("Player role Assigned");
+		
 		//While Loop
 		while(true)
 		{	

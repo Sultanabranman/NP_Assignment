@@ -38,17 +38,18 @@ public class Server {
 	private final int DEALER = 0;
 	private final int PLAYER = 1;
 	
+	//Create client list
 	private final ArrayList<HandleAClient> clients = new ArrayList<>();
 	protected static int player_scores[] = new int[5];
 	protected static int num_clients = 0;
 	protected static int players_ready = 0;
 	protected static int players_finished = 0;
-	private static ObjectOutputStream toDealer;
-	private static ObjectInputStream fromDealer;
+	protected static ObjectOutputStream toDealer;
+	protected static ObjectInputStream fromDealer;
 	
 	public Server()
 	{
-		//Create client list
+		System.out.println("Server started");
 		
 		
 		//Create log files		
@@ -61,9 +62,11 @@ public class Server {
 			//Main server service loop
 			while(true)
 			{
+				System.out.println("Awaiting client connection");
 				//Await client connection
 				Socket socket = serverSocket.accept();
 				
+				System.out.println("New client connected");
 				//Log new client connection
 				
 				//Get current number of clients connected
@@ -76,8 +79,7 @@ public class Server {
 				clients.add(task);
 				
 				//Run new thread
-				new Thread(task).start();
-				
+				new Thread(task).start();				
 			}
 		}
 		catch(IOException e)
@@ -98,8 +100,7 @@ public class Server {
 		
 		public synchronized void run()
 		{
-			//Client slot on server reserved for dealer
-			int dealer_slot = 0;
+			
 			try
 			{
 				//Open input and output streams to and from client
@@ -112,31 +113,22 @@ public class Server {
 				//Clean any data out of output stream
 				outputToClient.flush();				
 				
-				//If client is the first client to connect, assign them role of 
-				//dealer
-				if(client_num == dealer_slot)
-				{
-					RoleAssignmentOperation role_assignment = new 
-							RoleAssignmentOperation(client_num);
-					role_assignment.setRole(Definitions.DEALER);
-					outputToClient.writeObject(role_assignment);
-					
-					toDealer = outputToClient;
-					fromDealer = inputFromClient;
-				}
-				//If dealer is already assigned, assign client role of player
-				else
-				{
-					RoleAssignmentOperation role_assignment = new 
-							RoleAssignmentOperation(client_num);
-					role_assignment.setRole(Definitions.PLAYER);
-					outputToClient.writeObject(role_assignment);
-				}					
+				System.out.println("Assgining client role");
+				
+				RequestRoleOperation request = (RequestRoleOperation) 
+						inputFromClient.readObject();
+				
+				//Pass in client number for request to use
+				request.setTarget(client_num);
+				request.setOutputStream(outputToClient);
+				request.setInputStream(inputFromClient);
+				
+				request.execute();								
 				
 				//Manage requests between dealer and player
 				while(true)
 				{
-					//Await role assignment from server
+					//Await request from client
 					Message message = (Message) inputFromClient.readObject();
 					
 					//Pass in input and output streams to the client to allow 

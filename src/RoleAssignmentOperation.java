@@ -28,7 +28,5 @@ public class RoleAssignmentOperation extends Message{
 	
 	public void setRole(int role) {
 		this.role = role;
-	}
-	
-	
+	}	
 }

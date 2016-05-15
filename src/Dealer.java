@@ -50,6 +50,8 @@ public class Dealer {
 		this.fromServer = fromServer;
 		this.client_num = client_num;
 		
+		System.out.println("Dealer role assigned");
+		
 		//Main loop for dealer
 		while(true)
 		{

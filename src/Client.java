@@ -27,23 +27,32 @@ import java.net.Socket;
  *
  */
 public class Client {
+	
+	private static ObjectOutputStream toServer;
+	private static ObjectInputStream fromServer;
 
 	public Client() 
 	{
 		try
 		{
-			//Create socket connection to the server
+			System.out.println("Client started");
+			
+			//Connects client to server
 			Socket socket = new Socket("localhost", 8000);
 			
-			//Open input and output streams to the server
-			ObjectInputStream fromServer = new ObjectInputStream(
-					socket.getInputStream());
-			
-			ObjectOutputStream toServer = new ObjectOutputStream(
-					socket.getOutputStream());
-			
+			//Creates input and output streams from client to server
+			toServer = new ObjectOutputStream(socket.getOutputStream());			
+			fromServer = new ObjectInputStream(socket.getInputStream());
+
 			//Flush any data from output stream
 			toServer.flush();			
+			
+			RequestRoleOperation request = new RequestRoleOperation
+					(Definitions.SERVER);
+			
+			toServer.writeObject(request);
+			
+			System.out.println("Awaiting role assignment");
 			
 			//Await role assignment from server
 			Message message = (Message) fromServer.readObject();
