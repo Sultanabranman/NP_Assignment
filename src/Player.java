@@ -154,6 +154,8 @@ public class Player {
 					input_valid = true;
 					
 					try {
+						toServer.close();
+						fromServer.close();
 						socket.close();
 						buf_in.close();
 						is.close();
@@ -197,7 +199,7 @@ public class Player {
 		{
 			//Create new ready message to send to server
 			PlayerReadyOperation ready = new PlayerReadyOperation
-					(Definitions.SERVER);
+					(Definitions.SERVER, client_num);
 			
 			//Send ready message to server
 			toServer.writeObject(ready);
@@ -290,10 +292,7 @@ public class Player {
 		
 		//Flag to indicate if the player has chosen to stand
 		boolean stand = false;
-		
-		//Variable containing current hand's value.
-		int hand_value = Card.hand_value(hand);
-		
+				
 		//Variable containing user's input
 		String input = null;		
 					
@@ -307,6 +306,8 @@ public class Player {
 			
 			//Print the user's options to the console
 			display_hand_options();			
+			
+			input = null;
 			
 			//Get player input
 			input = get_user_input();
@@ -354,7 +355,7 @@ public class Player {
 			//If stand selected, player is bust, or the player has 5 cards, 
 			//pass hand total to the server				
 			PlayerStatusMessage result = new PlayerStatusMessage
-					(Definitions.SERVER, Card.hand_value(hand), client_num);
+					(Definitions.SERVER, client_num, Card.hand_value(hand));
 			
 			toServer.writeObject(result);	
 			
@@ -423,7 +424,14 @@ public class Player {
 			input = buf_in.readLine();
 			
 			//Convert all input characters to uppercase
-			input = input.toUpperCase();						
+			input = input.toUpperCase();
+			
+			//Set input to 0 if input was blank for when parse int is called or
+			//else an exception will be thrown
+			if(input == null || input.equals(""))
+			{
+				input = "0";
+			}
 		} 
 		catch (IOException e) {
 			System.err.println(e);

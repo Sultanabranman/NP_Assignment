@@ -1,13 +1,15 @@
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 
 public class StartGameOperation extends Message{
 
 	private static final long serialVersionUID = 1L;
 	
-	public StartGameOperation(int target) {
-		super(target);
+	public StartGameOperation(int target, int sender) {
+		super(target, sender);
 	}
 	
 	public void execute(ObjectOutputStream out, ObjectInputStream in)
@@ -22,8 +24,11 @@ public class StartGameOperation extends Message{
 		}		
 	}
 	
-	public void log()
+	public void log(Socket target)
 	{
+		String action = "Game started";
 		
+		//Log required information
+		Server.game_log.writeToLog(action, target.getInetAddress());
 	}
 }

@@ -49,7 +49,7 @@ public class Client {
 			toServer.flush();			
 			
 			RequestRoleOperation request = new RequestRoleOperation
-					(Definitions.SERVER);
+					(Definitions.SERVER, 0);
 			
 			toServer.writeObject(request);
 			

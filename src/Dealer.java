@@ -74,7 +74,7 @@ public class Dealer {
 					{
 						System.out.println("Game started");
 						//When players are ready, start the game
-						start_game();
+						start_game();						
 					}
 				}					
 			}
@@ -133,7 +133,9 @@ public class Dealer {
 		while(!game_finished)
 		{
 			serve_players();								
-		}				
+		}	
+		
+		start_game = Definitions.NO;
 		
 	}
 	private void serve_players()
@@ -187,7 +189,7 @@ public class Dealer {
 		
 		//While the dealer's hand value is under 17, and the dealer isn't 
 		//holding 5 cards
-		while((hand_value <= 17) && (cards_in_hand != 5))
+		while((hand_value < 17) && (cards_in_hand != 5))
 		{			
 			//If the dealer's hand totals under 17, the dealer draws a card
 			hand[cards_in_hand] = draw_card();		

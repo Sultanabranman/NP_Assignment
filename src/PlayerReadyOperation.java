@@ -1,17 +1,24 @@
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 
 public class PlayerReadyOperation extends Message{
 	
 	private static final long serialVersionUID = 1L;	
 	
-	public PlayerReadyOperation(int target) {
-		super(target);		
+	public PlayerReadyOperation(int target, int sender) {
+		super(target, sender);		
 	}	
 	
-	public void log() {
+	public void log(Socket target, Socket sender) {
+		String request = "Ready sent";
 		
+		//Log required information for this message
+		Server.comm_log.writeToLog(request, sender.getInetAddress());
+		
+		return;
 	}
 	
 	public void execute(ObjectOutputStream out, ObjectInputStream in) {
@@ -22,9 +29,13 @@ public class PlayerReadyOperation extends Message{
 			System.out.println("All players ready");
 			
 			StartGameOperation dealer_start = new StartGameOperation
-					(Definitions.DEALER);
+					(Definitions.DEALER, Definitions.SERVER);
 			StartGameOperation start = new StartGameOperation
-					(Definitions.PLAYER);
+					(Definitions.PLAYER, Definitions.SERVER);
+			
+			//Log dealer started information
+			dealer_start.log(Server.clients.get(Definitions.dealer_slot)
+					.getSocket());
 			
 			//Get the client stored in the dealer slot and send the start 
 			//message targeted at the dealer
@@ -33,6 +44,10 @@ public class PlayerReadyOperation extends Message{
 			//For each connected client, send the start game message
 			for(int i = 1; i < Server.clients.size(); i++)
 			{
+				//Log player started information
+				start.log(Server.clients.get(i).getSocket());
+				
+				//Send start message
 				Server.clients.get(i).write(start);
 			}
 		}

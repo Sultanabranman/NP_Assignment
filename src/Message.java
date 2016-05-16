@@ -1,6 +1,8 @@
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.Socket;
 
 /** 
  * Message class is used for communication between Player, Dealer, and Server 
@@ -17,8 +19,10 @@ public class Message implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private int target;
+	
+	private int sender;
 
-	public Message(int target)
+	public Message(int target, int sender)
 	{
 		this.target = target;
 	}		
@@ -29,10 +33,14 @@ public class Message implements Serializable{
 
 	public void setTarget(int target) {
 		this.target = target;
-	}
+	}	
 	
+	public int getSender() {
+		return sender;
+	}
+
 	//Blank log method to be overridden by subclasses
-	public void log()
+	public void log(Socket target, Socket sender)
 	{
 		
 	}

@@ -34,9 +34,6 @@ import java.net.*;
 import java.util.ArrayList;
 
 public class Server {
-
-	private final int DEALER = 0;
-	private final int PLAYER = 1;
 	
 	//Create client list
 	protected static final ArrayList<HandleAClient> clients = new ArrayList<>();
@@ -47,17 +44,23 @@ public class Server {
 	protected static ObjectOutputStream toDealer;
 	protected static ObjectInputStream fromDealer;
 	
+	protected static ServerSocket serverSocket;
+	
+	protected static Log comm_log;
+	protected static Log game_log;
+	
 	public Server()
 	{
-		System.out.println("Server started");
+		System.out.println("Server started");	
 		
-		
-		//Create log files		
+		//Create log files	
+		comm_log = new Log("communication_log.txt", "Communication Log");
+		game_log = new Log("game_log.txt", "Game Log");
 		
 		//Open server socket
 		try
 		{
-			ServerSocket serverSocket = new ServerSocket(8000);
+			serverSocket = new ServerSocket(8000);
 				
 			//Main server service loop
 			while(true)
@@ -94,6 +97,8 @@ public class Server {
 	{
 		private Socket socket;
 		private int client_num;
+		private Socket targetSocket;
+		private Socket senderSocket;
 		
 		private ObjectInputStream inputFromClient = null;
 		private ObjectOutputStream outputToClient = null;
@@ -117,6 +122,12 @@ public class Server {
 			}
 		}
 		
+		
+		//Getter for the socket in this thread
+		public Socket getSocket() {
+			return socket;
+		}
+
 		public synchronized void run()
 		{			
 			try
@@ -137,7 +148,10 @@ public class Server {
 						inputFromClient.readObject();
 				
 				//Pass in client number for request to use
-				request.setTarget(client_num);				
+				request.setTarget(client_num);
+				
+				request.log(clients.get(request.getSender()).getSocket());
+				
 				request.execute(outputToClient, inputFromClient);				
 				
 				//Manage requests between dealer and player
@@ -146,8 +160,25 @@ public class Server {
 					//Await request from client
 					Message message = (Message) inputFromClient.readObject();
 					
+					//If the message's target is the server, don't attempt to 
+					//get the server's socket
+					if(message.getTarget() == Definitions.SERVER)
+					{
+						targetSocket = null;
+					}
+					//If the message's target isn't the server, set the target 
+					//socket
+					else
+					{
+						//Get the target's socket for logging purposes
+						targetSocket = clients.get
+								(message.getTarget()).getSocket();
+					}					
+					
+					senderSocket = clients.get(message.getSender()).getSocket();
+					
 					//Log communication stored in message
-					message.log();
+					message.log(targetSocket, senderSocket);
 					
 					//If the target is the dealer, set the stored input and 
 					//output streams to the dealer
