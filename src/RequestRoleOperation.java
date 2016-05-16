@@ -1,11 +1,14 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 
 public class RequestRoleOperation extends Message{
 
 	private static final long serialVersionUID = 1L;
+	
+	private Socket socket;
 	
 	public RequestRoleOperation(int target) {
 		super(target);

@@ -11,6 +11,7 @@ public class Definitions implements Serializable{
 	//Client slot on server reserved for dealer
 	public final static int dealer_slot = 0;
 	
+	public final static int MAX_HAND_VALUE = 21;
 	public Definitions(){
 		
 	}

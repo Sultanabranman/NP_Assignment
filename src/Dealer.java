@@ -32,14 +32,18 @@ public class Dealer {
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
 	protected static int start_game = Definitions.NO;
+	//Flag to indicate players are still able to draw cards
+	protected static boolean players_playing = true;
+	//Flag to indicate that a game is currently running
+	protected static boolean game_finished = false;
 	private int client_num;
 	//private Socket socket;
 	
 	//Array to hold the cards currently held by the dealer
-	private Card[] hand = new Card[5];
+	protected static Card[] hand = new Card[5];
 	
 	//Variable containing current number of cards in hand
-	private int cards_in_hand = 0;	
+	private static int cards_in_hand = 0;	
 	
 	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
 			int client_num)
@@ -124,33 +128,18 @@ public class Dealer {
 			//Draw card for hand
 			hand[i] = draw_card();
 			cards_in_hand++;
-		}			
-		
-		//Flag to indicate that a game is currently running
-		boolean game_finished = false;
+		}				
 		
 		while(!game_finished)
 		{
-			serve_players();				
-			
-			//If the player stands, dealer plays their hand
-			play_hand();				
-			
-			//Dealer evaluates cards
-			//evaluate_cards();
-			
-			//Dealer communicates results to the server.
-			communicate_results();
+			serve_players();								
 		}				
 		
 	}
 	private void serve_players()
 	{		
 		try
-		{
-			//Flag to indicate players are still able to draw cards
-			boolean players_playing = true;
-			
+		{			
 			//While the players have not gone bust or chosen to stand
 			while(players_playing)
 			{	
@@ -191,7 +180,7 @@ public class Dealer {
 	
 	//Automatically plays hand until hand value totals over 17 or 5 cards are
 	//held.
-	private void play_hand()
+	protected static void play_hand()
 	{
 		//Variable containing current hand's value.
 		int hand_value = Card.hand_value(hand);
@@ -201,7 +190,9 @@ public class Dealer {
 		while((hand_value <= 17) && (cards_in_hand != 5))
 		{			
 			//If the dealer's hand totals under 17, the dealer draws a card
-			hand[cards_in_hand - 1] = draw_card();			
+			hand[cards_in_hand] = draw_card();		
+			
+			cards_in_hand++;
 			
 			//Get the current value of cards in hand
 			hand_value = Card.hand_value(hand);			
@@ -212,35 +203,54 @@ public class Dealer {
 	}
 	
 	//Determine the winner by comparing each player's hand total to the dealer's
-	protected void evaluate_cards(int dealer_total, int[] player_totals)
+	//Returns strings with the player's win status
+	protected static String[] evaluate_cards
+		(Card dealer_hand[], int[] player_totals)
 	{
-		int MAX_HAND_VALUE = 21;
+		//Array to be filled with player's win status and returned to calling 
+		//function
+		String results[] = new String[player_totals.length];
 		
+		int dealer_total = Card.hand_value(dealer_hand);
+		
+		//Loop through all player results passed in
 		for(int i = 0; i < player_totals.length; i++)
 		{
-			if(player_totals[i] > MAX_HAND_VALUE)
+			//If the player total is not completed, there are no more players 
+			//to evaluate, set all subsequent results to null
+			if(player_totals[i] == 0)
 			{
-				//Dealer wins
+				results[i] = null;
+				continue;
+				
 			}
-			else if(dealer_total > MAX_HAND_VALUE)
+			//If the player went bust, player loses
+			if(player_totals[i] > Definitions.MAX_HAND_VALUE)
 			{
-				//Player wins
+				results[i] = "Lost";
 			}
+			//If the dealer went bust, player wins
+			else if(dealer_total > Definitions.MAX_HAND_VALUE)
+			{
+				results[i] = "Won";
+			}
+			//If the player's score was greater then the dealer's, player wins
+			else if(player_totals[i] > dealer_total)
+			{
+				results[i] = "Won";
+			}
+			//If the player's total equaled the dealer's total
 			else if(dealer_total == player_totals[i])
 			{
-				//Draw
+				results[i] = "Drew";
 			}
+			//If the player's total was less then the dealer's
 			else
 			{
-				//Dealer_wins
+				results[i] = "Lost";
 			}
 		}
 		
-		return;
-	}
-	
-	private void communicate_results()
-	{
-		return;
+		return results;
 	}
 }

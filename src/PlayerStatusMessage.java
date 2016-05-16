@@ -38,28 +38,23 @@ public class PlayerStatusMessage extends Message{
 	}
 	
 	public void execute(ObjectOutputStream out, ObjectInputStream in) {
-		try {
-			//Increment the number of players finished
-			Server.players_finished++;
+		
+		//Increment the number of players finished
+		Server.players_finished++;
+		
+		//Add player score to the array stored in the server
+		Server.player_scores[client_num - 1] = this.player_score;
+		
+		//If the number of players finished is equal to the number of 
+		//clients playing minus the dealer, send the results to the dealer
+		if(Server.players_finished == Server.num_clients - 1)
+		{
+			EvaluateGameOperation totals = new EvaluateGameOperation
+					(Definitions.DEALER, Server.player_scores);
 			
-			//Add player score to the array stored in the server
-			Server.player_scores[client_num - 1] = this.player_score;
-			
-			//If the number of players finished is equal to the number of 
-			//clients playing minus the dealer, send the results to the dealer
-			if(Server.players_finished == Server.num_clients - 1)
-			{
-				EvaluateGameOperation totals = new EvaluateGameOperation
-						(Definitions.SERVER, Server.player_scores);
-				
-				//Send message through to dealer to evaluate the game based on 
-				//scores sent with message
-				out.writeObject(totals);
-			}
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//Send message through to dealer to evaluate the game based on 
+			//scores sent with message
+			Server.clients.get(Definitions.dealer_slot).write(totals);
 		}		
 	}
 }

@@ -1,8 +1,11 @@
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 
 public class RoleAssignmentOperation extends Message{
+	
+	private Socket socket;
 	
 	public RoleAssignmentOperation(int target) {
 		super(target);
@@ -25,7 +28,7 @@ public class RoleAssignmentOperation extends Message{
 		else if(role == Definitions.PLAYER)
 		{
 			//Make this client a player
-			new Player(out, in, getTarget());
+			new Player(out, in, getTarget(), Client.socket);
 		}
 	}
 	

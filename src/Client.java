@@ -30,6 +30,7 @@ public class Client {
 	
 	private static ObjectOutputStream toServer;
 	private static ObjectInputStream fromServer;
+	protected static Socket socket;
 
 	public Client() 
 	{
@@ -38,7 +39,7 @@ public class Client {
 			System.out.println("Client started");
 			
 			//Connects client to server
-			Socket socket = new Socket("localhost", 8000);
+			socket = new Socket("localhost", 8000);
 			
 			//Creates input and output streams from client to server
 			toServer = new ObjectOutputStream(socket.getOutputStream());			

@@ -47,18 +47,22 @@ public class Player {
 	private InputStreamReader is = new InputStreamReader(System.in);
 	
 	//Open buffered reader 
-	private BufferedReader buf_in = new BufferedReader(is);		
+	private BufferedReader buf_in = new BufferedReader(is);	
+	
+	//Variable to store socket connection to the server
+	private Socket socket;
 	
 	//Constructor for the player class, takes input and output streams set up 
 	//when client was created as parameters. Also requires client identification
 	//number 
 	public Player(ObjectOutputStream toServer, ObjectInputStream fromServer, 
-			int client_num)
+			int client_num, Socket socket)
 	{
 		//Store passed in variables to allow class methods access to them
 		this.toServer = toServer;
 		this.fromServer = fromServer;
 		this.client_num = client_num;
+		this.socket = socket;
 		
 		//Identify that the player role has been assigned
 		System.out.println("Player role Assigned");
@@ -149,8 +153,18 @@ public class Player {
 					//Indicate that the input was valid
 					input_valid = true;
 					
+					try {
+						socket.close();
+						buf_in.close();
+						is.close();
+					} 
+					catch (IOException e) {						
+						e.printStackTrace();
+					}
+					
 					//Close the client
 					System.exit(1);
+					
 					break;
 				}
 				default:
@@ -270,7 +284,7 @@ public class Player {
 	//Method to play hand until player either goes bust, chooses to stand, or 
 	//has 5 cards
 	private void play_hand()
-	{
+	{		
 		//Flag to indicate if player's hand has gone over 21
 		boolean player_is_bust = false;
 		
@@ -287,13 +301,12 @@ public class Player {
 		//card or standing 
 		while((stand == false) && (player_is_bust == false) && 
 				(cards_in_hand != 5))
-		{		
+		{	
 			//Prints the player's current hand information to the console
 			display_current_state();			
 			
 			//Print the user's options to the console
-			display_hand_options();				
-			
+			display_hand_options();			
 			
 			//Get player input
 			input = get_user_input();
@@ -315,7 +328,7 @@ public class Player {
 						//Set flag to indicate player is bust
 						player_is_bust = true;
 					}
-					
+										
 					break;
 				}
 				//If stand is selected, set flag to indicate so
@@ -330,34 +343,27 @@ public class Player {
 					System.out.println();
 					break;
 				}
-			}							
-			
-			try
-			{					
-				//If stand selected, player is bust, or the player has 5 cards, 
-				//pass hand total to the server				
-				PlayerStatusMessage result = new PlayerStatusMessage
-						(Definitions.SERVER, hand_value, client_num);
-				
-				toServer.writeObject(result);		
-				
-				return;
 			}
-			catch(IOException e)
-			{
-				System.err.println(e);
-				//Close input readers
-				try 
-				{
-					buf_in.close();
-					is.close();
-				} 
-				catch (IOException ex) 
-				{
-					e.printStackTrace();
-				}
-			}		
 		}
+										
+		try
+		{	
+			//Prints the player's current hand information to the console
+			display_current_state();			
+			
+			//If stand selected, player is bust, or the player has 5 cards, 
+			//pass hand total to the server				
+			PlayerStatusMessage result = new PlayerStatusMessage
+					(Definitions.SERVER, Card.hand_value(hand), client_num);
+			
+			toServer.writeObject(result);	
+			
+			return;
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}		
 	}
 
 	private void display_hand_options()
