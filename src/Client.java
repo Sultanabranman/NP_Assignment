@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * The Client class is a generic class that is used when client is passed in 
@@ -60,6 +61,10 @@ public class Client {
 			
 			message.execute(toServer, fromServer);						
 		}
+		catch(SocketException e)
+		{
+			System.err.println("Error: Game is full closing");
+		}
 		catch(IOException e)
 		{
 			System.err.println(e);
@@ -69,4 +74,18 @@ public class Client {
 			System.err.println(e);
 		}		
 	}
+
+	public static ObjectOutputStream getToServer() {
+		return toServer;
+	}
+
+	public static ObjectInputStream getFromServer() {
+		return fromServer;
+	}
+
+	public static Socket getSocket() {
+		return socket;
+	}
+	
+	
 }

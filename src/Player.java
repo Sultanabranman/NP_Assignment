@@ -186,8 +186,7 @@ public class Player {
 					} 
 					catch (IOException e) {						
 						e.printStackTrace();
-					}
-					
+					}					
 					
 					//Close the client
 					System.exit(1);
@@ -241,6 +240,9 @@ public class Player {
 	//received from the server
 	private void wait_for_start()
 	{
+		System.out.println("Waiting for game to start");
+		
+		//Waiting for game to start
 		while(game_started == false)
 		{
 			//Message object to store any received messages from the server

@@ -27,6 +27,7 @@
  *
  */
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -51,6 +52,8 @@ public class Server {
 	
 	public Server()
 	{
+		int client_num = 0;
+		
 		System.out.println("Server started");	
 		
 		//Create log files	
@@ -61,6 +64,12 @@ public class Server {
 		try
 		{
 			serverSocket = new ServerSocket(8000);
+			
+			//Initialise array list with null values
+			for(int i = 0; i < Definitions.MAX_CLIENTS; i++)
+			{
+				clients.add(null);
+			}
 				
 			//Main server service loop
 			while(true)
@@ -72,17 +81,34 @@ public class Server {
 				System.out.println("New client connected");
 				//Log new client connection
 				
-				//Get current number of clients connected
-				num_clients = clients.size();
+				//If the client list is full, reject the new client
+				if(num_clients == Definitions.MAX_CLIENTS)
+				{
+					//reject client
+					System.out.println("Game full");
+					reject_client(socket);
+					continue;
+				}
+				
+				//Get the first available position in client list
+				for(int i = 0; i < clients.size(); i++)
+				{
+					if(clients.get(i) == null)
+					{
+						//Set client number to available position 
+						client_num = i;
+						break;
+					}
+				}
 				
 				//Create new thread for connected client
-				HandleAClient task = new HandleAClient(socket, num_clients);
+				HandleAClient task = new HandleAClient(socket, client_num);
 				
 				//Store new client thread information in client list
-				clients.add(task);
+				clients.set(client_num, task);
 				
-				//Get current number of clients connected
-				num_clients = clients.size();
+				//Increment the number of clients
+				num_clients++;
 				
 				//Run new thread
 				new Thread(task).start();				
@@ -93,6 +119,36 @@ public class Server {
 			System.err.println(e);
 		}			
 	}
+	
+	public void reject_client(Socket socket)
+	{
+		
+		//Open input and output streams to and from client
+		try {	
+			//Open object output stream
+			ObjectOutputStream outputToClient = new ObjectOutputStream
+					(socket.getOutputStream());
+			
+			//Create rejection message
+			RejectClientOperation reject = new RejectClientOperation
+					(Definitions.PLAYER, Definitions.SERVER);
+			
+			//Send reject message to client
+			outputToClient.writeObject(reject);
+			
+			//Close the output stream
+			outputToClient.close();
+			
+			//Close the socket
+			socket.close();
+			
+			return;
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	class HandleAClient implements Runnable
 	{
 		private Socket socket;
@@ -177,8 +233,22 @@ public class Server {
 				//Manage requests between dealer and player
 				while(true)
 				{
-					//Await request from client
-					Message message = (Message) inputFromClient.readObject();
+					Message message = null;
+					try
+					{					
+						//Await request from client
+						message = (Message) inputFromClient.readObject();
+					}
+					catch(EOFException e)
+					{
+						System.out.println("Client disconnected");
+						//Decrease the number of clients
+						num_clients--;
+						//Set the index in clients to null
+						clients.set(client_num, null);
+						
+						return;
+					}
 					
 					//If the message's target is the server, don't attempt to 
 					//get the server's socket

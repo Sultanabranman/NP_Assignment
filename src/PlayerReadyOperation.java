@@ -44,6 +44,11 @@ public class PlayerReadyOperation extends Message{
 			//For each connected client, send the start game message
 			for(int i = 1; i < Server.clients.size(); i++)
 			{
+				//If client position is null, continue to next client
+				if(Server.clients.get(i) == null)
+				{
+					continue;
+				}
 				//Log player started information
 				start.log(Server.clients.get(i).getSocket());
 				
