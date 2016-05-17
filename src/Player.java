@@ -228,10 +228,18 @@ public class Player {
 			//Send ready message to server
 			toServer.writeObject(ready);
 		}
+		catch(SocketException e)
+		{
+			System.out.println("Server shutdown");
+			System.out.println("Closing");
+			
+			System.exit(1);
+		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
+		
 		
 		return;			
 	}
@@ -255,6 +263,13 @@ public class Player {
 				//Execute the method contained within the message
 				start_game.execute(toServer, fromServer);
 			} 
+			catch(SocketException e)
+			{
+				System.out.println("Server shutdown");
+				System.out.println("Closing");
+				
+				System.exit(1);
+			}
 			catch (ClassNotFoundException e) 
 			{				
 				e.printStackTrace();
@@ -412,6 +427,13 @@ public class Player {
 			
 			return;
 		}
+		catch(SocketException e)
+		{
+			System.out.println("Server shutdown");
+			System.out.println("Closing");
+			
+			System.exit(1);
+		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
@@ -455,6 +477,13 @@ public class Player {
 			
 			//Execute message received from server
 			status.execute(toServer, fromServer);
+		}
+		catch(SocketException e)
+		{
+			System.out.println("Server shutdown");
+			System.out.println("Closing");
+			
+			System.exit(1);
 		}
 		catch(IOException e)
 		{

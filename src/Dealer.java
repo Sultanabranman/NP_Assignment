@@ -1,6 +1,8 @@
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.SocketException;
 import java.util.Random;
 
 /**
@@ -63,10 +65,20 @@ public class Dealer {
 				//Wait for players ready command from server.
 				while(start_game == Definitions.NO)
 				{
-					//Retrieve any messages from the server
-					Message message = (Message) fromServer.readObject();
-					
-					message.execute(toServer, fromServer);
+					try
+					{
+						//Retrieve any messages from the server
+						Message message = (Message) fromServer.readObject();
+						
+						message.execute(toServer, fromServer);
+					}
+					catch(EOFException | SocketException e)
+					{
+						System.out.println("Server shutdown");
+						System.out.println("Closing");
+						
+						System.exit(1);
+					}					
 					
 					//If players ready is communicated from server, start the 
 					//game 
@@ -148,12 +160,22 @@ public class Dealer {
 			//While the players have not gone bust or chosen to stand
 			while(players_playing)
 			{	
-				//Retrieve messages from server
-				Message message = (Message) fromServer.readObject();
-				
-				HandleRequest request = new HandleRequest(message);
-				
-				new Thread(request).start();
+				try
+				{
+					//Retrieve messages from server
+					Message message = (Message) fromServer.readObject();
+					
+					HandleRequest request = new HandleRequest(message);
+					
+					new Thread(request).start();
+				}
+				catch(EOFException | SocketException e)
+				{
+					System.out.println("Server shutdown");
+					System.out.println("Closing");
+					
+					System.exit(1);
+				}				
 			}			
 		}
 		catch(IOException e)

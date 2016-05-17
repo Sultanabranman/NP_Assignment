@@ -40,7 +40,8 @@ public class Client {
 			System.out.println("Client started");
 			
 			//Connects client to server
-			socket = new Socket("localhost", 8000);
+			//socket = new Socket("m1-c26n1.csit.rmit.edu.au" , Definitions.port);
+			socket = new Socket("localhost" , 8000);
 			
 			//Creates input and output streams from client to server
 			toServer = new ObjectOutputStream(socket.getOutputStream());			

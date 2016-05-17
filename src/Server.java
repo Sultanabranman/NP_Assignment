@@ -63,6 +63,7 @@ public class Server {
 		//Open server socket
 		try
 		{
+			//serverSocket = new ServerSocket(Definitions.port);
 			serverSocket = new ServerSocket(8000);
 			
 			//Initialise array list with null values
