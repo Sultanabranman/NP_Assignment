@@ -158,7 +158,7 @@ public class Card implements Serializable{
 		
 		System.out.printf("Cards in hand: ");
 				
-		while(hand[i] != null)
+		while(i != 5 && hand[i] != null)
 		{
 			//Display card name
 			System.out.printf("%s, ",hand[i].name);

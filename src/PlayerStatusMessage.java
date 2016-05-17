@@ -36,7 +36,7 @@ public class PlayerStatusMessage extends Message{
 
 	public void log(Socket target, Socket sender) {
 		String request = "Score sent";
-		String action = "Player scored" + player_score;
+		String action = "Player scored " + player_score;
 		
 		//Log required information for this message
 		Server.game_log.writeToLog(request, sender.getInetAddress());

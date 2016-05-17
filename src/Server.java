@@ -126,6 +126,26 @@ public class Server {
 		//Getter for the socket in this thread
 		public Socket getSocket() {
 			return socket;
+		}		
+		
+		//Getter from this client's object output stream
+		public ObjectOutputStream getOutputToClient() {
+			return outputToClient;
+		}
+
+		//Set this client's output stream
+		public void setOutputToClient(ObjectOutputStream outputToClient) {
+			this.outputToClient = outputToClient;
+		}		
+		
+		//Getter for this client's object input stream
+		public ObjectInputStream getInputFromClient() {
+			return inputFromClient;
+		}
+
+		//Set this clients input stream
+		public void setInputFromClient(ObjectInputStream inputFromClient) {
+			this.inputFromClient = inputFromClient;
 		}
 
 		public synchronized void run()
@@ -185,17 +205,39 @@ public class Server {
 					if(message.getTarget() == Definitions.DEALER)
 					{						
 						toDealer.writeObject(message);
+						toDealer.flush();
 					}	
 					//If the message's target is the server, execute the command
 					//within the server
 					else if(message.getTarget() == Definitions.SERVER)
 					{
 						message.execute(outputToClient, inputFromClient);
+						outputToClient.flush();
 					}
 					//If the target of the message is the player					
 					else
-					{						
-						clients.get(message.getTarget()).write(message);
+					{			
+						try
+						{						
+							clients.get(message.getTarget()).write(message);
+							clients.get(message.getTarget()).
+								getOutputToClient().flush();
+						}
+						catch(SocketException e)
+						{
+							ObjectInputStream input = new ObjectInputStream
+									(clients.get(message.getTarget()).											
+											getSocket().getInputStream());
+							
+							ObjectOutputStream output = new ObjectOutputStream
+									(clients.get(message.getTarget()).											
+											getSocket().getOutputStream());
+							
+							clients.get(message.getTarget()).setOutputToClient
+								(output);
+							clients.get(message.getTarget()).setInputFromClient
+								(input);							
+						}						
 					}					
 				}
 			}

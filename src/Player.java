@@ -1,9 +1,11 @@
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Manages all functions related to the player. The player role is assigned by 
@@ -67,6 +69,14 @@ public class Player {
 		//Identify that the player role has been assigned
 		System.out.println("Player role Assigned");
 		
+		try {
+			//Set timeout to ten seconds when waiting for input from the server
+			socket.setSoTimeout(10000);
+		} 
+		catch (SocketException e) {
+			e.printStackTrace();
+		}
+		
 		//Start the main player management method
 		while(true)
 		{
@@ -99,7 +109,10 @@ public class Player {
 		play_hand();								
 		
 		//Get game results from the server and notify the player
-		get_game_results();			
+		get_game_results();		
+		
+		//Reset the game started flag
+		game_started = false;
 	}
 	
 	//Method to reset all variables back to default state when starting a 
@@ -134,6 +147,17 @@ public class Player {
 			//Get user input to indicate ready status
 			input = get_user_input();
 			
+			//If input equal to 1 or 2, leave input as is
+			if((input.equals("1")) || (input.equals("2"))) 
+			{
+				;
+			}
+			//Else set input to 0
+			else
+			{
+				input = "0";
+			}			
+			
 			//Convert input into an integer
 			int input_num = Integer.parseInt(input);
 			
@@ -150,10 +174,10 @@ public class Player {
 				//User selects to exit the game
 				case 2:
 				{
-					//Indicate that the input was valid
-					input_valid = true;
-					
 					try {
+						//Indicate that the input was valid
+						input_valid = true;					
+					
 						toServer.close();
 						fromServer.close();
 						socket.close();
@@ -163,6 +187,7 @@ public class Player {
 					catch (IOException e) {						
 						e.printStackTrace();
 					}
+					
 					
 					//Close the client
 					System.exit(1);
@@ -257,21 +282,34 @@ public class Player {
 	
 	private void request_card()
 	{
-		try {		
+		boolean sent = false;
 		
+		try {				
 			//Create new request for card
 			RequestCardOperation request = new RequestCardOperation
-					(Definitions.DEALER, client_num);
-			
-			//Send request to server
-			toServer.writeObject(request);
-			
-			//Receive message from the dealer containing the card
-			SendCardOperation receiveCard = (SendCardOperation) 
-					fromServer.readObject();
-			
-			//Add received card to hand
-			hand[cards_in_hand] = receiveCard.getCard();
+					(Definitions.DEALER, client_num);			
+			while(sent != true)
+			{			
+				try{
+					//Send request to server
+					toServer.writeObject(request);
+					
+					//Receive message from the dealer containing the card
+					SendCardOperation receiveCard = (SendCardOperation) 
+							fromServer.readObject();
+					
+					//Add received card to hand
+					hand[cards_in_hand] = receiveCard.getCard();
+					
+					sent = true;
+				}
+				catch(SocketException e)
+				{
+					//Creates input and output streams from client to server
+					toServer = new ObjectOutputStream(socket.getOutputStream());			
+					fromServer = new ObjectInputStream(socket.getInputStream());
+				}				
+			}
 			
 			//Increment cards in hand
 			cards_in_hand++;
@@ -311,6 +349,17 @@ public class Player {
 			
 			//Get player input
 			input = get_user_input();
+			
+			//If input equal to 1 or 2, leave input as is
+			if((input.equals("1")) || (input.equals("2"))) 
+			{
+				;
+			}
+			//Else set input to 0
+			else
+			{
+				input = "0";
+			}
 			
 			//Convert player input to an integer
 			int input_num = Integer.parseInt(input);

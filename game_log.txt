@@ -1,32 +1,41 @@
 Game Log
-2016/05/16 22:45:14 127.0.0.1 Dealer Assigned
-2016/05/16 22:45:15 127.0.0.1 Player Assigned
-2016/05/16 22:45:17 127.0.0.1 Game started
-2016/05/16 22:45:17 127.0.0.1 Game started
-2016/05/16 22:45:17 127.0.0.1 Card request received
-2016/05/16 22:45:17 127.0.0.1 Five drawn
-2016/05/16 22:45:17 127.0.0.1 Card request received
-2016/05/16 22:45:17 127.0.0.1 Two drawn
-2016/05/16 22:45:19 127.0.0.1 Card request received
-2016/05/16 22:45:19 127.0.0.1 Eight drawn
-2016/05/16 22:45:22 127.0.0.1 Card request received
-2016/05/16 22:45:22 127.0.0.1 One drawn
-2016/05/16 22:45:26 127.0.0.1 Score sent
-2016/05/16 22:45:26 127.0.0.1 Player scored16
-2016/05/16 22:45:26 127.0.0.1 Evaluating cards
-2016/05/16 22:45:26 127.0.0.1 Results sent to players
-2016/05/16 22:45:26 127.0.0.1 Lost game
-2016/05/16 22:45:31 127.0.0.1 Game started
-2016/05/16 22:45:31 127.0.0.1 Game started
-2016/05/16 22:45:31 127.0.0.1 Card request received
-2016/05/16 22:45:31 127.0.0.1 Three drawn
-2016/05/16 22:45:50 127.0.0.1 Player Assigned
-2016/05/16 22:45:54 127.0.0.1 Game started
-2016/05/16 22:45:54 127.0.0.1 Game started
-2016/05/16 22:45:54 127.0.0.1 Game started
-2016/05/16 22:45:54 127.0.0.1 Card request received
-2016/05/16 22:45:54 127.0.0.1 Queen drawn
-2016/05/16 22:45:54 127.0.0.1 Card request received
-2016/05/16 22:45:54 127.0.0.1 Eight drawn
-2016/05/16 22:45:55 127.0.0.1 Score sent
-2016/05/16 22:45:55 127.0.0.1 Player scored18
+2016/05/17 14:17:04 127.0.0.1 Dealer Assigned
+2016/05/17 14:17:05 127.0.0.1 Player Assigned
+2016/05/17 14:17:07 127.0.0.1 Game started
+2016/05/17 14:17:07 127.0.0.1 Game started
+2016/05/17 14:17:07 127.0.0.1 Card request received
+2016/05/17 14:17:07 127.0.0.1 Four drawn
+2016/05/17 14:17:07 127.0.0.1 Card request received
+2016/05/17 14:17:07 127.0.0.1 Four drawn
+2016/05/17 14:17:29 127.0.0.1 Card request received
+2016/05/17 14:17:29 127.0.0.1 Four drawn
+2016/05/17 14:17:30 127.0.0.1 Card request received
+2016/05/17 14:17:30 127.0.0.1 Five drawn
+2016/05/17 14:17:32 127.0.0.1 Card request received
+2016/05/17 14:17:32 127.0.0.1 Five drawn
+2016/05/17 14:17:32 127.0.0.1 Score sent
+2016/05/17 14:17:32 127.0.0.1 Player scored 22
+2016/05/17 14:17:32 127.0.0.1 Evaluating cards
+2016/05/17 14:17:32 127.0.0.1 Results sent to players
+2016/05/17 14:17:32 127.0.0.1 Lost game
+2016/05/17 14:17:35 127.0.0.1 Game started
+2016/05/17 14:17:35 127.0.0.1 Game started
+2016/05/17 14:17:35 127.0.0.1 Card request received
+2016/05/17 14:17:35 127.0.0.1 Two drawn
+2016/05/17 14:17:35 127.0.0.1 Card request received
+2016/05/17 14:17:35 127.0.0.1 Ace drawn
+2016/05/17 14:17:35 127.0.0.1 Card request received
+2016/05/17 14:17:35 127.0.0.1 Four drawn
+2016/05/17 14:17:36 127.0.0.1 Card request received
+2016/05/17 14:17:36 127.0.0.1 Jack drawn
+2016/05/17 14:17:36 127.0.0.1 Card request received
+2016/05/17 14:17:36 127.0.0.1 Queen drawn
+2016/05/17 14:17:36 127.0.0.1 Score sent
+2016/05/17 14:17:36 127.0.0.1 Player scored 27
+2016/05/17 14:17:36 127.0.0.1 Evaluating cards
+2016/05/17 14:17:36 127.0.0.1 Results sent to players
+2016/05/17 14:17:36 127.0.0.1 Lost game
+2016/05/17 14:18:58 127.0.0.1 Player Assigned
+2016/05/17 14:19:08 127.0.0.1 Player Assigned
+2016/05/17 14:19:40 127.0.0.1 Player Assigned
+2016/05/17 14:20:07 127.0.0.1 Player Assigned

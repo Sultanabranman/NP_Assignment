@@ -122,6 +122,9 @@ public class Dealer {
 		//Reset dealers hand at start of the game to be blank
 		Card.initialise_hand(hand);
 		
+		//Reset cards in hand to be 0
+		cards_in_hand = 0;
+		
 		//Deal two cards to dealer
 		for(int i = 0; i < 2; i++)
 		{
@@ -189,7 +192,7 @@ public class Dealer {
 		
 		//While the dealer's hand value is under 17, and the dealer isn't 
 		//holding 5 cards
-		while((hand_value < 17) && (cards_in_hand != 5))
+		while((hand_value < 17) && (cards_in_hand != hand.length))
 		{			
 			//If the dealer's hand totals under 17, the dealer draws a card
 			hand[cards_in_hand] = draw_card();		
@@ -252,7 +255,7 @@ public class Dealer {
 				results[i] = "Lost";
 			}
 		}
-		
+					
 		return results;
 	}
 }
