@@ -38,7 +38,6 @@ public class Dealer {
 	protected static boolean players_playing = true;
 	//Flag to indicate that a game is currently running
 	protected static boolean game_finished = false;
-	private int client_num;
 	//private Socket socket;
 	
 	//Array to hold the cards currently held by the dealer
@@ -47,13 +46,13 @@ public class Dealer {
 	//Variable containing current number of cards in hand
 	private static int cards_in_hand = 0;	
 	
+	//Constructor for the Dealer class
 	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
 			int client_num)
 	{
 		//Store passed in data in this object
 		this.toServer = toServer;
 		this.fromServer = fromServer;
-		this.client_num = client_num;
 		
 		System.out.println("Dealer role assigned");
 		
@@ -70,8 +69,11 @@ public class Dealer {
 						//Retrieve any messages from the server
 						Message message = (Message) fromServer.readObject();
 						
+						//Execute the message received from the server
 						message.execute(toServer, fromServer);
 					}
+					//If the socket connection to the server is lost, server has
+					//shutdown
 					catch(EOFException | SocketException e)
 					{
 						System.out.println("Server shutdown");
@@ -145,14 +147,19 @@ public class Dealer {
 			cards_in_hand++;
 		}				
 		
+		//While the game is in progress, complete all player requests
 		while(!game_finished)
 		{
 			serve_players();								
 		}	
 		
+		//Reset the start game flag
 		start_game = Definitions.NO;
 		
 	}
+	
+	//Method to manage any requests received from the player's while game is in 
+	//progress
 	private void serve_players()
 	{		
 		try
@@ -165,8 +172,10 @@ public class Dealer {
 					//Retrieve messages from server
 					Message message = (Message) fromServer.readObject();
 					
+					//Start a new thread for the request
 					HandleRequest request = new HandleRequest(message);
 					
+					//Start the newly created thread
 					new Thread(request).start();
 				}
 				catch(EOFException | SocketException e)
@@ -194,13 +203,17 @@ public class Dealer {
 	class HandleRequest implements Runnable
 	{
 		private Message message;
+		
+		//Constructor for request thread, takes a received message as a 
+		//parameter
 		public HandleRequest(Message message)
 		{
 			this.message = message;
 		}
 		
 		public synchronized void run()
-		{					
+		{			
+			//Execute the method contained within the message
 			message.execute(toServer, fromServer);			
 		}
 	}
@@ -219,6 +232,7 @@ public class Dealer {
 			//If the dealer's hand totals under 17, the dealer draws a card
 			hand[cards_in_hand] = draw_card();		
 			
+			//Increment the number of cards in the dealer's hand
 			cards_in_hand++;
 			
 			//Get the current value of cards in hand

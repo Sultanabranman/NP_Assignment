@@ -1,3 +1,7 @@
+/**
+ * Definitions class holds any constant definitions that are used by all classes
+ * Serves no purpose other than to store definitions
+ */
 import java.io.Serializable;
 
 

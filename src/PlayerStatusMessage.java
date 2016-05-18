@@ -1,4 +1,8 @@
-
+/** 
+ * Message sent by player to communicate their final score for the game in 
+ * progress. If all players are finished, a request is sent to the dealer to 
+ * evaluate the game.
+ */
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -11,6 +15,7 @@ public class PlayerStatusMessage extends Message{
 	private int sender = 0;
 	private int player_score = 0;
 
+	//Constructor for the message, requires the player's score
 	public PlayerStatusMessage(int target, int sender, int player_score) {
 		super(target, sender);
 		this.player_score = player_score;
@@ -18,22 +23,27 @@ public class PlayerStatusMessage extends Message{
 		
 	}		
 	
+	//Getter for the player's client number
 	public int getClient_num() {
 		return sender;
 	}
 
+	//Setter for the player's client number within this message
 	public void setClient_num(int client_num) {
 		this.sender = client_num;
 	}
 
+	//Getter for the player's score
 	public int getPlayer_score() {
 		return player_score;
 	}
 
+	//Setter for the player's score
 	public void setPlayer_score(int player_score) {
 		this.player_score = player_score;
 	}
 
+	//Method to be executed on the server to log required information
 	public void log(Socket target, Socket sender) {
 		String request = "Score sent";
 		String action = "Player scored " + player_score;
@@ -45,6 +55,9 @@ public class PlayerStatusMessage extends Message{
 		return;
 	}
 	
+	//Method to be executed when the message is received. Indicates to the 
+	//server that the player is finished, and if all players are finished, 
+	//sends a message to the dealer to evaluate the game
 	public void execute(ObjectOutputStream out, ObjectInputStream in) {
 		
 		//Increment the number of players finished

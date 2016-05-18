@@ -1,4 +1,7 @@
-
+/**
+ * Message sent from the Dealer to the server. When the server receives this 
+ * message it distributes the player results accordingly
+ */
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -11,6 +14,8 @@ public class ResultsToPlayerOperation extends Message{
 	private String results[];
 	private int dealer_total;
 	
+	//Constructor for the message, requires the game results to be passed in as 
+	//well as the dealer's total
 	public ResultsToPlayerOperation(int target, int sender, String[] results, 
 			int dealer_total) {
 		super(target, sender);
@@ -18,10 +23,18 @@ public class ResultsToPlayerOperation extends Message{
 		this.dealer_total = dealer_total;
 	}
 	
+	//Method to be executed when the message is received, runs through each 
+	//client in the client list and sends the results to them
 	public void execute(ObjectOutputStream out, ObjectInputStream in){
 		//Send each player their result
-		for(int i = 1; i < Server.num_clients; i++)
+		for(int i = 1; i < Server.clients.size(); i++)
 		{
+			//If the client slot is empty move on to next client
+			if(Server.clients.get(i) == null)
+			{
+				continue;
+			}
+			
 			//Create new operation to display result on player's end
 			DisplayResultsOperation result = new DisplayResultsOperation
 					(i, Definitions.SERVER, results[i - 1], 
@@ -38,6 +51,7 @@ public class ResultsToPlayerOperation extends Message{
 		reset_server_values();
 	}
 	
+	//Message to be executed by the server to log required information
 	public void log(Socket target, Socket sender){
 		String request = "Sending results to player";
 		String action = "Results sent to players";
@@ -49,6 +63,7 @@ public class ResultsToPlayerOperation extends Message{
 		return;
 	}
 	
+	//Reset the game flags within the server
 	public void reset_server_values()
 	{
 		//Reset player scores

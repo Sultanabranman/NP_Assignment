@@ -160,6 +160,7 @@ public class Server {
 		private ObjectInputStream inputFromClient = null;
 		private ObjectOutputStream outputToClient = null;
 		
+		//Contructor for the client thread
 		public HandleAClient(Socket socket, int client_num)
 		{
 			this.socket = socket;
@@ -221,14 +222,17 @@ public class Server {
 				
 				System.out.println("Assigning client role");
 				
+				//Receive a role assignment request from the client
 				RequestRoleOperation request = (RequestRoleOperation) 
 						inputFromClient.readObject();
 				
 				//Pass in client number for request to use
 				request.setTarget(client_num);
 				
+				//Log the request
 				request.log(clients.get(request.getSender()).getSocket());
 				
+				//Execute the request
 				request.execute(outputToClient, inputFromClient);				
 				
 				//Manage requests between dealer and player
@@ -289,13 +293,17 @@ public class Server {
 					else
 					{			
 						try
-						{						
+						{			
+							//Send the message to the target player
 							clients.get(message.getTarget()).write(message);
+							
+							//Flush the output stream
 							clients.get(message.getTarget()).
 								getOutputToClient().flush();
 						}
 						catch(SocketException e)
 						{
+							//Reopen the communication streams to the client
 							ObjectInputStream input = new ObjectInputStream
 									(clients.get(message.getTarget()).											
 											getSocket().getInputStream());

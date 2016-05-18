@@ -50,9 +50,11 @@ public class Client {
 			//Flush any data from output stream
 			toServer.flush();			
 			
+			//Create a request to be assigned a role
 			RequestRoleOperation request = new RequestRoleOperation
 					(Definitions.SERVER, 0);
 			
+			//Send the request to the server
 			toServer.writeObject(request);
 			
 			System.out.println("Awaiting role assignment");
@@ -60,6 +62,7 @@ public class Client {
 			//Await role assignment from server
 			Message message = (Message) fromServer.readObject();
 			
+			//Execute the message received from the server
 			message.execute(toServer, fromServer);						
 		}
 		catch(SocketException e)
@@ -76,14 +79,17 @@ public class Client {
 		}		
 	}
 
+	//Get the output stream for this client
 	public static ObjectOutputStream getToServer() {
 		return toServer;
 	}
 
+	//Get the input stream for this client
 	public static ObjectInputStream getFromServer() {
 		return fromServer;
 	}
 
+	//Get the socket for this client
 	public static Socket getSocket() {
 		return socket;
 	}

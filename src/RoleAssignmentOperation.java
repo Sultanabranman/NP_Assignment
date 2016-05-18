@@ -1,13 +1,14 @@
-
+/**
+ * Message sent from the Server to the client. Assigns the player their role
+ */
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
 public class RoleAssignmentOperation extends Message{
-	
-	private Socket socket;
-	
+
+	//Constructor for the message
 	public RoleAssignmentOperation(int target, int sender) {
 		super(target, sender);
 	}
@@ -16,6 +17,7 @@ public class RoleAssignmentOperation extends Message{
 	
 	private int role;	
 	
+	//Method to be executed on the server to log required information
 	public void log(Socket target) {
 		String role_assigned = null;
 		
@@ -36,12 +38,16 @@ public class RoleAssignmentOperation extends Message{
 		return;		
 	}
 	
+	//Method to be executed when message is received. Starts the assigned role 
+	//within the client
 	public void execute(ObjectOutputStream out, ObjectInputStream in){
+		//If the role assigned is the dealer role
 		if(role == Definitions.DEALER)
 		{
 			//Make this client dealer
 			new Dealer(out, in, getTarget());
 		}
+		//If the role assigned is the player role
 		else if(role == Definitions.PLAYER)
 		{
 			//Make this client a player
@@ -49,6 +55,7 @@ public class RoleAssignmentOperation extends Message{
 		}
 	}
 	
+	//Sets the role for the client
 	public void setRole(int role) {
 		this.role = role;
 	}	

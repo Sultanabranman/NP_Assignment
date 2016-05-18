@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -440,6 +439,7 @@ public class Player {
 		}		
 	}
 
+	//Displays the player's options when a game is in progress 
 	private void display_hand_options()
 	{
 		System.out.println("Please select one of the following "

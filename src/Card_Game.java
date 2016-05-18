@@ -13,20 +13,24 @@ public class Card_Game {
 		String server = "server";
 		String client = "client";
 		
+		//If the wrong number of arguments is entered
 		if(args.length != 1)
 		{
 			invalid_args_hook();
 			return;
 		}
-		
+		//If server is passed in
 		if(args[0].equals(server))
 		{
 			new Server();
 		}
+		//If client is passed in
 		else if(args[0].equals(client))
 		{
 			new Client();
 		}
+		//If right number of arguments is passed in, but argument doesn't match
+		//'server' or 'client'
 		else
 		{
 			invalid_args_hook();

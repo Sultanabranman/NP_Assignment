@@ -27,14 +27,17 @@ public class Message implements Serializable{
 		this.target = target;
 	}		
 	
+	//Getter for the message's target
 	public int getTarget() {
 		return target;
 	}
 
+	//Setter for the target of the message
 	public void setTarget(int target) {
 		this.target = target;
 	}	
 	
+	//Getter for the sender of the message
 	public int getSender() {
 		return sender;
 	}

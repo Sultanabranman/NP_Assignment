@@ -1,4 +1,9 @@
-
+/**
+ * Message sent from a player indicating that the player wishes to sign up for 
+ * the game. When the server receives the request, it checks to see how many 
+ * players are ready, and if all players are ready, it sends out messages to 
+ * start the game
+ */
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -8,10 +13,12 @@ public class PlayerReadyOperation extends Message{
 	
 	private static final long serialVersionUID = 1L;	
 	
+	//Constructor for the message
 	public PlayerReadyOperation(int target, int sender) {
 		super(target, sender);		
 	}	
 	
+	//Method to be executed by server to log any required information
 	public void log(Socket target, Socket sender) {
 		String request = "Ready sent";
 		
@@ -21,13 +28,18 @@ public class PlayerReadyOperation extends Message{
 		return;
 	}
 	
+	//Method to be executed when the message is received, checks how many 
+	//players are ready. If all players are ready, sends messages to start the 
+	//game
 	public void execute(ObjectOutputStream out, ObjectInputStream in) {
 		Server.players_ready++;
 		
+		//If all players are ready
 		if(Server.players_ready == (Server.num_clients - 1))
 		{
 			System.out.println("All players ready");
 			
+			//Create start game messages
 			StartGameOperation dealer_start = new StartGameOperation
 					(Definitions.DEALER, Definitions.SERVER);
 			StartGameOperation start = new StartGameOperation

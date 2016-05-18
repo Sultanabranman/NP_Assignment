@@ -95,6 +95,7 @@ public class Card implements Serializable{
 		
 		int num_aces = 0;
 		
+		//For each card in the player's hand, add the value to hand total
 		for(int i = 0; i < hand.length; i++)
 		{
 			//If the current card in hand is empty
@@ -103,6 +104,7 @@ public class Card implements Serializable{
 				break;
 			}
 			
+			//If current card is an ace
 			if(hand[i].value == 0)
 			{
 				//increment number of aces count
