@@ -33,7 +33,7 @@ public class Client {
 	private static ObjectInputStream fromServer;
 	protected static Socket socket;
 
-	public Client() 
+	public Client(String server, int port) 
 	{
 		try
 		{
@@ -41,7 +41,7 @@ public class Client {
 			
 			//Connects client to server
 			//socket = new Socket("m1-c26n1.csit.rmit.edu.au" , Definitions.port);
-			socket = new Socket("localhost" , 8000);
+			socket = new Socket(server , port);
 			
 			//Creates input and output streams from client to server
 			toServer = new ObjectOutputStream(socket.getOutputStream());			

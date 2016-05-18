@@ -238,13 +238,36 @@ Process for single player game:
         - Wait on game results.
 
 ******************************************************************************
-*                              Required Classes                              *
+*                              Program Operation                             *
 ******************************************************************************
+A server must first be started for the game to function
 
-- Server
-- Client
-- Card
-- Game
-- Log
-- Player
-- Dealer
+Server is started using command java Card_Game server <server> <port>
+
+Once the server is started, Client's can be connected (2 for single player, 6 
+for multiplayer). Each client is automatically assigned a role.
+
+Client is started using command java Card_Game client <server> <port>
+
+The server will then wait for all players to be ready before starting the 
+game.
+
+When the game is started, the player's request cards until they either choose
+to stand, have 5 cards in their hand, or go bust. The player then sends their
+result to the server.
+
+When the server has results from all the players, the server send the player 
+results to the dealer to be evaluated.
+
+The dealer plays their hand and evaluates their result against all players.
+
+The dealer then send the player results to the server to be distributed.
+
+When all players receive their result, they can ready up for the next game.
+
+Player's can choose to wither ready up or exit. If they exit, the server 
+frees their slot.
+
+The server logs all messages passed through it in a communcation log; and all
+game actions within a game log. Only one of these logs can be created at a 
+time 

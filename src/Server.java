@@ -50,7 +50,7 @@ public class Server {
 	protected static Log comm_log;
 	protected static Log game_log;
 	
-	public Server()
+	public Server(String server, int port)
 	{
 		int client_num = 0;
 		
@@ -63,8 +63,8 @@ public class Server {
 		//Open server socket
 		try
 		{
-			//serverSocket = new ServerSocket(Definitions.port);
-			serverSocket = new ServerSocket(8000);
+			serverSocket = new ServerSocket(port);
+			//serverSocket = new ServerSocket(8000);
 			
 			//Initialise array list with null values
 			for(int i = 0; i < Definitions.MAX_CLIENTS; i++)
