@@ -43,10 +43,6 @@ public class RequestRoleOperation extends Message{
 				//Send message to client
 				out.writeObject(role_assignment);
 				
-				//Set dealer input and output streams in the server
-				Server.toDealer = out;
-				Server.fromDealer = in;
-				
 				System.out.println("Dealer role assgined");
 			}
 			//If dealer is already assigned, assign client role of player

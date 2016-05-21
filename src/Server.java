@@ -42,8 +42,8 @@ public class Server {
 	protected static int num_clients = 0;
 	protected static int players_ready = 0;
 	protected static int players_finished = 0;
-	protected static ObjectOutputStream toDealer;
-	protected static ObjectInputStream fromDealer;
+	//protected static ObjectOutputStream toDealer;
+	//protected static ObjectInputStream fromDealer;
 	
 	protected static ServerSocket serverSocket;
 	
@@ -160,7 +160,10 @@ public class Server {
 		private ObjectInputStream inputFromClient = null;
 		private ObjectOutputStream outputToClient = null;
 		
-		//Contructor for the client thread
+		private ObjectInputStream fromDealer = null;
+		private ObjectOutputStream toDealer = null;
+		
+		//Constructor for the client thread
 		public HandleAClient(Socket socket, int client_num)
 		{
 			this.socket = socket;
@@ -233,7 +236,24 @@ public class Server {
 				request.log(clients.get(request.getSender()).getSocket());
 				
 				//Execute the request
-				request.execute(outputToClient, inputFromClient);				
+				request.execute(outputToClient, inputFromClient);	
+				
+				//Create new connection to the dealer if the client is a player
+				if(client_num != Definitions.dealer_slot);
+				{
+					Socket dealer_socket = new Socket(Definitions.dealer_server, 
+							Definitions.port);
+					
+					//Open input and output streams to and from dealer
+					fromDealer = new ObjectInputStream
+							(dealer_socket.getInputStream());
+					
+					toDealer = new ObjectOutputStream
+							(dealer_socket.getOutputStream());
+					
+					//Clean any data out of output stream
+					outputToClient.flush();
+				}
 				
 				//Manage requests between dealer and player
 				while(true)
@@ -281,6 +301,9 @@ public class Server {
 					{						
 						toDealer.writeObject(message);
 						toDealer.flush();
+						Message card = (Message) fromDealer.readObject();
+						
+						card.execute(outputToClient, inputFromClient);
 					}	
 					//If the message's target is the server, execute the command
 					//within the server

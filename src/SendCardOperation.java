@@ -2,6 +2,7 @@
  * Message sent from the dealer to the player who requested the card. Contains 
  * the card drawn
  */
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -45,7 +46,16 @@ public class SendCardOperation extends Message{
 	}
 	
 	public void execute(ObjectOutputStream out, ObjectInputStream in){
-		
+		//Dealer sends card to player
+		SendCardOperation message = new SendCardOperation(Definitions.PLAYER, 
+				Definitions.SERVER, getCard());		
+	
+		//Send the card to the player through the server
+		try {
+			out.writeObject(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

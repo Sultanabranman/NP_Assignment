@@ -43,7 +43,7 @@ public class EvaluateGameOperation extends Message{
 		
 		try {
 			//Send message to the server
-			out.writeObject(message);
+			Dealer.toServer.writeObject(message);
 		} 
 		catch (IOException e) {			
 			e.printStackTrace();

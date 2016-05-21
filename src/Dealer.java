@@ -36,7 +36,7 @@ public class Dealer {
 	/**************************************************************************/
 	/*                               VARIABLES                                */
 	/**************************************************************************/
-	private ObjectOutputStream toServer; 
+	protected static ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
 	
 	//Variable containing current number of cards in hand
@@ -152,11 +152,15 @@ public class Dealer {
 				//Clean any data out of output stream
 				toClient.flush();	
 				
-				//Wait for message to be received
-				Message message = (Message) fromClient.readObject();
+				while(true)
+				{
+					//Wait for message to be received
+					Message message = (Message) fromClient.readObject();
+					
+					//Execute the method contained within the message
+					message.execute(toClient, fromClient);
+				}
 				
-				//Execute the method contained within the message
-				message.execute(toClient, fromClient);
 			}
 			catch(IOException | ClassNotFoundException e)
 			{
