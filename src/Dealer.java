@@ -58,6 +58,13 @@ public class Dealer {
 		
 		System.out.println("Dealer role assigned");
 		
+		//Create a thread to handle any communication on main server 
+		//communication streams
+		ManageMainThread manage = new ManageMainThread(toServer, fromServer);
+		
+		//Start the newly created thread
+		new Thread(manage).start();
+		
 		//Open server socket on port defined in the definitions class
 		try 
 		{
@@ -88,9 +95,13 @@ public class Dealer {
 					//Start the newly created thread
 					new Thread(task).start();
 			}
+			
 			catch(IOException e)
 			{
-				e.printStackTrace();
+				System.out.println("Server shutdown");
+				System.out.println("Closing");
+				
+				System.exit(1);
 			}
 		}		
 	}
@@ -123,6 +134,42 @@ public class Dealer {
 		return randomInt;
 	}
 	
+	class ManageMainThread implements Runnable
+	{
+		private ObjectInputStream in;
+		private ObjectOutputStream out;
+		
+		//Constructor for thread, requires input and output streams to the 
+		//server to be passed in
+		public ManageMainThread(ObjectOutputStream out, ObjectInputStream in)
+		{
+			this.out = out;
+			this.in = in;
+		}
+		
+		public synchronized void run()
+		{
+			try
+			{
+				while(true)
+				{
+					//Wait for message to be received
+					Message message = (Message) in.readObject();
+					
+					//Execute the method contained within the message
+					message.execute(out, in);
+				}				
+			}
+			catch(IOException | ClassNotFoundException e)
+			{
+				System.out.println("Server shutdown");
+				System.out.println("Closing");
+				
+				System.exit(1);
+			}			
+		}
+	}
+	
 	class ManageRequests implements Runnable
 	{
 		//Variable to store the passed in socket
@@ -145,12 +192,11 @@ public class Dealer {
 			{
 				//Create object input/output streams to allow messages to be 
 				//sent and received
-				fromClient = new ObjectInputStream(socket.getInputStream());
-				
 				toClient = new ObjectOutputStream(socket.getOutputStream());
 				
 				//Clean any data out of output stream
-				toClient.flush();	
+				toClient.flush();
+				fromClient = new ObjectInputStream(socket.getInputStream());					
 				
 				while(true)
 				{
@@ -164,7 +210,10 @@ public class Dealer {
 			}
 			catch(IOException | ClassNotFoundException e)
 			{
-				e.printStackTrace();
+				System.out.println("Server shutdown");
+				System.out.println("Closing");
+				
+				System.exit(1);
 			}
 			
 		}

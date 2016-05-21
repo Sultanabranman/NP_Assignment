@@ -18,7 +18,7 @@ public class Definitions implements Serializable{
 	public final static String dealer_server = "m1-c25n1.csit.rmit.edu.au";
 	
 	public final static int MAX_HAND_VALUE = 21;
-	public final static int MAX_CLIENTS = 2;
+	public final static int MAX_CLIENTS = 6;
 	public Definitions(){
 		
 	}

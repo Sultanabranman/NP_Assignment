@@ -57,14 +57,13 @@ public class Server {
 		System.out.println("Server started");	
 		
 		//Create log files	
-		comm_log = new Log("communication_log.txt", "Communication Log");
-		game_log = new Log("game_log.txt", "Game Log");
+		comm_log = new Log("communication.log", "Communication Log");
+		game_log = new Log("game.log", "Game Log");
 		
 		//Open server socket
 		try
 		{
 			serverSocket = new ServerSocket(port);
-			//serverSocket = new ServerSocket(8000);
 			
 			//Initialise array list with null values
 			for(int i = 0; i < Definitions.MAX_CLIENTS; i++)
@@ -156,6 +155,7 @@ public class Server {
 		private int client_num;
 		private Socket targetSocket;
 		private Socket senderSocket;
+		private Socket dealer_socket;
 		
 		private ObjectInputStream inputFromClient = null;
 		private ObjectOutputStream outputToClient = null;
@@ -212,16 +212,17 @@ public class Server {
 		public synchronized void run()
 		{			
 			try
-			{
+			{				
 				//Open input and output streams to and from client
-				inputFromClient = new ObjectInputStream
-						(socket.getInputStream());
-				
 				outputToClient = new ObjectOutputStream
 						(socket.getOutputStream());
 				
 				//Clean any data out of output stream
-				outputToClient.flush();				
+				outputToClient.flush();	
+				
+				
+				inputFromClient = new ObjectInputStream
+						(socket.getInputStream());
 				
 				System.out.println("Assigning client role");
 				
@@ -236,23 +237,23 @@ public class Server {
 				request.log(clients.get(request.getSender()).getSocket());
 				
 				//Execute the request
-				request.execute(outputToClient, inputFromClient);	
+				request.execute(outputToClient, inputFromClient);					
 				
 				//Create new connection to the dealer if the client is a player
-				if(client_num != Definitions.dealer_slot);
-				{
+				if(client_num != Definitions.dealer_slot)
+				{					
 					Socket dealer_socket = new Socket(Definitions.dealer_server, 
 							Definitions.port);
-					
-					//Open input and output streams to and from dealer
-					fromDealer = new ObjectInputStream
-							(dealer_socket.getInputStream());
 					
 					toDealer = new ObjectOutputStream
 							(dealer_socket.getOutputStream());
 					
 					//Clean any data out of output stream
-					outputToClient.flush();
+					toDealer.flush();
+					
+					//Open input and output streams to and from dealer
+					fromDealer = new ObjectInputStream
+							(dealer_socket.getInputStream());					
 				}
 				
 				//Manage requests between dealer and player
@@ -260,7 +261,7 @@ public class Server {
 				{
 					Message message = null;
 					try
-					{					
+					{							
 						//Await request from client
 						message = (Message) inputFromClient.readObject();
 					}
@@ -301,6 +302,7 @@ public class Server {
 					{						
 						toDealer.writeObject(message);
 						toDealer.flush();
+						
 						Message card = (Message) fromDealer.readObject();
 						
 						card.execute(outputToClient, inputFromClient);

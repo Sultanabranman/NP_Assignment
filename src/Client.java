@@ -40,16 +40,15 @@ public class Client {
 			System.out.println("Client started");
 			
 			//Connects client to server
-			//socket = new Socket("m1-c26n1.csit.rmit.edu.au" , Definitions.port);
-			socket = new Socket(server , port);
+			socket = new Socket(server , port);					
+			
+			toServer = new ObjectOutputStream(socket.getOutputStream());			
+			//Flush any data from output stream
+			toServer.flush();
 			
 			//Creates input and output streams from client to server
-			toServer = new ObjectOutputStream(socket.getOutputStream());			
 			fromServer = new ObjectInputStream(socket.getInputStream());
-
-			//Flush any data from output stream
-			toServer.flush();			
-			
+						
 			//Create a request to be assigned a role
 			RequestRoleOperation request = new RequestRoleOperation
 					(Definitions.SERVER, 0);

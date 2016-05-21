@@ -68,13 +68,13 @@ public class Player {
 		//Identify that the player role has been assigned
 		System.out.println("Player role Assigned");
 		
-		try {
+		/**try {
 			//Set timeout to ten seconds when waiting for input from the server
 			socket.setSoTimeout(10000);
 		} 
 		catch (SocketException e) {
 			e.printStackTrace();
-		}
+		}**/
 		
 		//Start the main player management method
 		while(true)
@@ -299,7 +299,6 @@ public class Player {
 	private void request_card()
 	{
 		boolean sent = false;
-		
 		try {				
 			//Create new request for card
 			RequestCardOperation request = new RequestCardOperation
@@ -422,7 +421,9 @@ public class Player {
 			PlayerStatusMessage result = new PlayerStatusMessage
 					(Definitions.SERVER, client_num, Card.hand_value(hand));
 			
-			toServer.writeObject(result);	
+			toServer.writeObject(result);
+			
+			System.out.println("Waiting for game results");
 			
 			return;
 		}

@@ -39,7 +39,7 @@ public class RequestCardOperation extends Message{
 		try {
 			//Dealer draws card
 			card = Dealer.draw_card();
-			
+		
 			//Dealer sends card to player
 			SendCardOperation message = new SendCardOperation(sender, 
 					Definitions.DEALER, card);		
