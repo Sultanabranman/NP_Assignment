@@ -27,26 +27,23 @@ public class EvaluateGameOperation extends Message{
 	//game flags and evaluates the game
 	public void execute(ObjectOutputStream out, ObjectInputStream in)
 	{
-		//Set players playin flag to false indicating that dealer needs to play
-		Dealer.players_playing = false;
+		//Array to hold the cards currently held by the dealer
+		Card[] hand = new Card[5];
 		
 		//Dealer plays through hand
-		Dealer.play_hand();
+		hand = Dealer.play_hand();
 		
 		//Evaluate the results by comparing dealer hand to player hands
-		String[] results = Dealer.evaluate_cards(Dealer.hand, player_scores);
+		String[] results = Dealer.evaluate_cards(hand, player_scores);
 		
 		//Create new results to player message
 		ResultsToPlayerOperation message = new ResultsToPlayerOperation
 				(Definitions.SERVER, Definitions.DEALER, results, 
-						Card.hand_value(Dealer.hand));
+						Card.hand_value(hand));
 		
 		try {
 			//Send message to the server
 			out.writeObject(message);
-			
-			//Set flag to indicate that the game is finished
-			Dealer.game_finished = true;
 		} 
 		catch (IOException e) {			
 			e.printStackTrace();

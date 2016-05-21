@@ -38,13 +38,6 @@ public class Dealer {
 	/**************************************************************************/
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
-	protected static int start_game = Definitions.NO;
-	//Flag to indicate players are still able to draw cards
-	protected static boolean players_playing = true;
-	//Flag to indicate that a game is currently running
-	protected static boolean game_finished = false;	
-	//Array to hold the cards currently held by the dealer
-	protected static Card[] hand = new Card[5];
 	
 	//Variable containing current number of cards in hand
 	private static int cards_in_hand = 0;	
@@ -99,10 +92,6 @@ public class Dealer {
 			{
 				e.printStackTrace();
 			}
-			catch(ClassNotFoundException e)
-			{
-				e.printStackTrace();
-			}
 		}		
 	}
 	
@@ -132,73 +121,6 @@ public class Dealer {
 		
 		//Return generated int
 		return randomInt;
-	}
-	
-	private void start_game()
-	{
-		//Reset dealers hand at start of the game to be blank
-		Card.initialise_hand(hand);
-		
-		//Reset cards in hand to be 0
-		cards_in_hand = 0;
-		
-		//Deal two cards to dealer
-		for(int i = 0; i < 2; i++)
-		{
-			//Draw card for hand
-			hand[i] = draw_card();
-			cards_in_hand++;
-		}				
-		
-		//While the game is in progress, complete all player requests
-		while(!game_finished)
-		{
-			serve_players();								
-		}	
-		
-		//Reset the start game flag
-		start_game = Definitions.NO;
-		
-	}
-	
-	//Method to manage any requests received from the player's while game is in 
-	//progress
-	private void serve_players()
-	{		
-		try
-		{			
-			//While the players have not gone bust or chosen to stand
-			while(players_playing)
-			{	
-				try
-				{
-					//Retrieve messages from server
-					Message message = (Message) fromServer.readObject();
-					
-					//Start a new thread for the request
-					HandleRequest request = new HandleRequest(message);
-					
-					//Start the newly created thread
-					new Thread(request).start();
-				}
-				catch(EOFException | SocketException e)
-				{
-					System.out.println("Server shutdown");
-					System.out.println("Closing");
-					
-					System.exit(1);
-				}				
-			}			
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-		catch(ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		return;
 	}
 	
 	class ManageRequests implements Runnable
@@ -266,8 +188,25 @@ public class Dealer {
 	
 	//Automatically plays hand until hand value totals over 17 or 5 cards are
 	//held.
-	protected static void play_hand()
+	protected static Card[] play_hand()
 	{
+		//Array to hold the cards currently held by the dealer
+		Card[] hand = new Card[5];
+		
+		//Reset dealers hand at start of the game to be blank
+		Card.initialise_hand(hand);
+		
+		//Reset cards in hand to be 0
+		cards_in_hand = 0;
+		
+		//Deal two cards to dealer
+		for(int i = 0; i < 2; i++)
+		{
+			//Draw card for hand
+			hand[i] = draw_card();
+			cards_in_hand++;
+		}
+		
 		//Variable containing current hand's value.
 		int hand_value = Card.hand_value(hand);
 		
@@ -286,7 +225,7 @@ public class Dealer {
 		}
 		
 		//If the dealer's hand totals over 17, the dealer stands. Return		
-		return;			
+		return hand;			
 	}
 	
 	//Determine the winner by comparing each player's hand total to the dealer's

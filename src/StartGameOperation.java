@@ -22,7 +22,7 @@ public class StartGameOperation extends Message{
 	{
 		if(getTarget() == Definitions.DEALER)
 		{
-			Dealer.start_game = Definitions.YES;
+			;
 		}
 		else
 		{
