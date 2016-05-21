@@ -2,6 +2,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.Random;
 
@@ -31,20 +33,27 @@ import java.util.Random;
  */
 public class Dealer {
 
+	/**************************************************************************/
+	/*                               VARIABLES                                */
+	/**************************************************************************/
 	private ObjectOutputStream toServer; 
 	private ObjectInputStream fromServer; 
 	protected static int start_game = Definitions.NO;
 	//Flag to indicate players are still able to draw cards
 	protected static boolean players_playing = true;
 	//Flag to indicate that a game is currently running
-	protected static boolean game_finished = false;
-	//private Socket socket;
-	
+	protected static boolean game_finished = false;	
 	//Array to hold the cards currently held by the dealer
 	protected static Card[] hand = new Card[5];
 	
 	//Variable containing current number of cards in hand
 	private static int cards_in_hand = 0;	
+	
+	private ServerSocket serverSocket;
+	
+	/**************************************************************************/
+	/*                               	CODE                                  */
+	/**************************************************************************/
 	
 	//Constructor for the Dealer class
 	public Dealer(ObjectOutputStream toServer, ObjectInputStream fromServer, 
@@ -56,41 +65,35 @@ public class Dealer {
 		
 		System.out.println("Dealer role assigned");
 		
+		//Open server socket on port defined in the definitions class
+		try 
+		{
+			serverSocket = new ServerSocket(Definitions.port);
+		} 
+		catch (IOException e1) 
+		{
+			e1.printStackTrace();
+		}
+		
 		//Main loop for dealer
 		while(true)
 		{
 			try
 			{				
-				//Wait for players ready command from server.
-				while(start_game == Definitions.NO)
-				{
-					try
-					{
-						//Retrieve any messages from the server
-						Message message = (Message) fromServer.readObject();
-						
-						//Execute the message received from the server
-						message.execute(toServer, fromServer);
-					}
-					//If the socket connection to the server is lost, server has
-					//shutdown
-					catch(EOFException | SocketException e)
-					{
-						System.out.println("Server shutdown");
-						System.out.println("Closing");
-						
-						System.exit(1);
-					}					
+					System.out.println("Awaiting new player connection");
 					
-					//If players ready is communicated from server, start the 
-					//game 
-					if(start_game == Definitions.YES)
-					{
-						System.out.println("Game started");
-						//When players are ready, start the game
-						start_game();						
-					}
-				}					
+					//Wait for a player to connect to the server which will then
+					//open a new connection to the dealer
+					Socket socket = serverSocket.accept();		
+					
+					System.out.println("New client connected");
+					
+					//Create a new thread to handle any messages received from 
+					//this socket connection
+					ManageRequests task = new ManageRequests(socket);
+					
+					//Start the newly created thread
+					new Thread(task).start();
 			}
 			catch(IOException e)
 			{
@@ -196,6 +199,49 @@ public class Dealer {
 			e.printStackTrace();
 		}
 		return;
+	}
+	
+	class ManageRequests implements Runnable
+	{
+		//Variable to store the passed in socket
+		private Socket socket;
+		
+		//Variable to store the input/output streams to the server
+		private ObjectInputStream fromClient;
+		private ObjectOutputStream toClient;
+		
+		//Constructor for thread, requires a socket to be passed in to allow new
+		//input and output streams to be created
+		public ManageRequests(Socket socket)
+		{
+			this.socket = socket;
+		}
+		
+		public synchronized void run()
+		{
+			try
+			{
+				//Create object input/output streams to allow messages to be 
+				//sent and received
+				fromClient = new ObjectInputStream(socket.getInputStream());
+				
+				toClient = new ObjectOutputStream(socket.getOutputStream());
+				
+				//Clean any data out of output stream
+				toClient.flush();	
+				
+				//Wait for message to be received
+				Message message = (Message) fromClient.readObject();
+				
+				//Execute the method contained within the message
+				message.execute(toClient, fromClient);
+			}
+			catch(IOException | ClassNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+			
+		}
 	}
 	
 	//Thread to manage any requests received from the server. New threads are 
